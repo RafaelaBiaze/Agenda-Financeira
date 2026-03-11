@@ -1,5 +1,5 @@
 import knex from 'knex';
-import config from '../../knexfile'; // Ajuste o caminho se necessário
+import config from '../../knexfile.js'; // Ajuste o caminho se necessário
 
 // Verificamos se a configuração existe, senão lançamos um erro claro
 if (!config.development) {

@@ -1,6 +1,6 @@
 import type { Knex } from "knex";
 
-export async function seed(knex: Knex): Promise<void> {
+export async function seed(knex: Knex) {
   // 1. Limpar as tabelas antes de inserir para não duplicar dados
   await knex("comprovantes").del();
   await knex("contas").del();
