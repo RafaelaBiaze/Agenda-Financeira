@@ -13,10 +13,14 @@ export interface IConta {
 
 class ContasModel {
   // Função para listar todas as contas com os nomes das categorias
-  async listarTodas() {
+  async listarTodas(id_usuario: number) {
     return await connection('contas')
-      .join('categorias', 'contas.id_categoria', 'categorias.id_categoria')
-      .join('responsaveis', 'contas.id_responsavel', 'responsaveis.id_responsavel')
+      // 1. Especificamos que o ID é da tabela contas
+      .where('contas.id_usuario', id_usuario)
+
+      .leftJoin('categorias', 'contas.id_categoria', 'categorias.id_categoria')
+      .leftJoin('responsaveis', 'contas.id_responsavel', 'responsaveis.id_responsavel')
+      
       .select(
         'contas.*', 
         'categorias.nome_categoria', 

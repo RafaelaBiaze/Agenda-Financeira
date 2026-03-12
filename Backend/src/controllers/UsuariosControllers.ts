@@ -15,14 +15,16 @@ export const UsuariosController = {
       const [novoUsuario] = await UsuariosModel.criar({
         nome,
         email,
-        senha: senhaCriptografada
+        senha: senhaCriptografada,
+        role: "user" // Por padrão, todo novo usuário é "user".
       });
 
       return res.status(201).json({ 
         mensagem: "Usuário criado com sucesso!",
         usuario: { id: novoUsuario.id_usuario, 
             nome, 
-            email 
+            email,
+            role: "user"
         } 
       });
     } catch (error) {

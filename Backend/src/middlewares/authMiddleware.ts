@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 // Interface para descrever o que tem dentro do Token
 interface TokenPayload {
   id: number;
+  role: 'admin' | 'user';
   iat: number; // Issued At (quando o token foi criado)
   exp: number; // Expires In (quando o token perde a validade)
 }
@@ -25,13 +26,19 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     // 3. Se o token foi alterado ou expirou, ele lançará um erro e cairá no 'catch'
     const data = jwt.verify(token, secret);
 
-    // 4. Extraímos o ID do usuário que guardamos lá no LoginController
-    const { id } = data as TokenPayload;
+    // 4. Extraímos o ID e Role do usuário que guardamos lá no LoginController
+    const { 
+      id,
+      role
+    } = data as TokenPayload;
     
-    // Anexamos o ID do usuário à requisição atual
-    req.usuarioId = id;
+    // Anexamos o ID e Roledo usuário à requisição atual
+    (req as any).user = {
+      id: id,
+      role: role
+    };
 
-    // 5. Ele encerra o trabalho do Middleware e passa para o Controller
+    console.log("AUTH: Salvei o usuário ->", req.user);
     return next();
 
   } catch {

@@ -8,6 +8,7 @@ export async function up(knex: Knex) {
         table.string("nome", 150).notNullable();
         table.string("email", 255).notNullable().unique();
         table.string("senha", 255).notNullable();
+        table.enum("role", ["admin", "user"]).defaultTo("user"); // Para controle de acesso
         table.timestamp("criado_em").defaultTo(knex.fn.now()); // created_at
         table.timestamp("atualizado_em").defaultTo(knex.fn.now()); // updated_at
     })

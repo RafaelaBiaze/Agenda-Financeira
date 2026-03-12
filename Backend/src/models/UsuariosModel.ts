@@ -6,6 +6,7 @@ export interface Usuario {
   nome: string;
   email: string;
   senha: string;
+  role: 'admin' | 'user';
   data_criacao?: string;
   data_atualizacao?: string;
 }
@@ -16,7 +17,7 @@ class UsuariosModel {
     return connection("usuarios").insert(usuario).returning("*");
   };
 
-  // Função para buscar um usuário pelo email (útil para login)
+  // Função para buscar um usuário pelo email
   async buscarPorEmail(email: string) {
     return connection("usuarios").where({ email }).first();
   }

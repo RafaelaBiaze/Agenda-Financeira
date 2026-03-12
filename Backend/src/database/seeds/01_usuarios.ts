@@ -10,11 +10,12 @@ export async function seed(knex: Knex) {
     const senhaAdmin = await bcrypt.hash("admin123", salt); // Senha para testes
 
   // 3. Inserir um usuário inicial para teste
-  await knex("usuarios").insert([
-    {
-      nome: "Admin",
-      email: "admin@example.com",
-      senha: senhaAdmin
-    }
-  ]);
+    await knex("usuarios").insert([
+      {
+        nome: "Admin",
+        email: "admin@example.com",
+        senha: senhaAdmin,
+        role: "admin" // Definindo o papel do usuário como admin
+      }
+    ]);
 };

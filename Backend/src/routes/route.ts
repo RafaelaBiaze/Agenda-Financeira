@@ -3,6 +3,7 @@ import ContasController from '../controllers/ContasControllers.js';
 import { UsuariosController } from '../controllers/UsuariosControllers.js';
 import { LoginController } from '../controllers/LoginControllers.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { isAdmin } from '../middlewares/isAdmin.js';
 
 const routes = Router();
 
@@ -10,7 +11,7 @@ const routes = Router();
 routes.get('/contas', authMiddleware, ContasController.index);
 
 // Quando o navegador acessar /usuarios, ele chama a função create do controller
-routes.post('/usuarios', UsuariosController.create);
+routes.post('/usuarios', authMiddleware, isAdmin, UsuariosController.create);
 
 // Login
 routes.post('/login', LoginController.login);

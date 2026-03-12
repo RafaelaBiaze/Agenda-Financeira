@@ -6,7 +6,7 @@ import UsuariosModel from "../models/UsuariosModel.js";
 export const LoginController = {
   async login(req: Request, res: Response) {
     try {
-      const { email, senha } = req.body;
+      const { email, senha, role } = req.body;
 
       // 1. Verificar se o usuário existe
       const usuario = await UsuariosModel.buscarPorEmail(email);
@@ -23,7 +23,7 @@ export const LoginController = {
       // 3. Gerar o Token JWT (O Crachá)
       const secret = process.env.SECRET_KEY || "chave_secreta"; // Usar váriavel de ambiente, porém colocar um valor padrão para evitar erros.
       const token = jwt.sign(
-        { id: usuario.id_usuario, email: usuario.email }, // Dados que vão dentro do token
+        { id: usuario.id_usuario, email: usuario.email, role: usuario.role }, // Dados que vão dentro do token
         secret, 
         { expiresIn: "30m" } // O token expira em 30 minutos por segurança
       );
@@ -32,7 +32,7 @@ export const LoginController = {
       return res.json({
         mensagem: "Login realizado com sucesso!",
         token: token,
-        usuario: { nome: usuario.nome, email: usuario.email }
+        usuario: { nome: usuario.nome, email: usuario.email, role: usuario.role }
       });
 
     } catch (error) {
