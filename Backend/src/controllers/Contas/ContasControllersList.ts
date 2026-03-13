@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
-import ContasModel from '../models/ContasModel.js';
+import ContasModel from '../../models/ContasModel.js';
 
-class ContasController {
-  async index(req: Request, res: Response) {
+class ContasControllerList {
+  async list(req: Request, res: Response) {
     try{
         // 1. Verifica se o usuário está autenticado e pega seu ID
         const id_usuario_logado = req.user?.id; // O middleware de autenticação deve ter anexado o usuário à requisição
@@ -14,7 +14,6 @@ class ContasController {
         // 2. Busca as contas do usuário logado
         const contas = await ContasModel.listarTodas(id_usuario_logado);
         return res.json(contas);
-
     }
     catch(error){
         return res.status(500).json({ erro: "Erro ao listar contas" });
@@ -22,4 +21,4 @@ class ContasController {
   }
 };
 
-export default new ContasController();
+export default new ContasControllerList();

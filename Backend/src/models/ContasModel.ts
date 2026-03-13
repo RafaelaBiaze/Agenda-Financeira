@@ -28,14 +28,32 @@ class ContasModel {
       );
   }
 
-  // Função para criar uma nova conta
+  // Criar conta nova
   async criar(dados: IConta) {
     return await connection('contas').insert(dados).returning('*');
   }
 
-  // Função para buscar uma conta específica pelo ID
-  async buscarPorId(id: number) {
-    return await connection('contas').where('id_conta', id).first();
+  // Buscar uma conta específica pelo ID
+  async buscarPorId(id: number, id_usuario: number) {
+    return await connection('contas').where({ 
+      'id_conta': id,
+      'id_usuario': id_usuario
+    }).first();
+  }
+
+  // Atualiza os dados de uma conta existente
+  async atualizar(id: number, dados: Partial<IConta>) {
+    return await connection('contas')
+      .where('id_conta', id)
+      .update(dados)
+      .returning('*');
+  }
+
+  // Remove uma conta do banco
+  async excluir(id: number) {
+    return await connection('contas')
+      .where('id_conta', id)
+      .delete();
   }
 }
 
