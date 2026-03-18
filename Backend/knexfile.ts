@@ -1,15 +1,23 @@
 // Update with your config settings.
 import type { Knex } from "knex";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const config: { [key: string]: Knex.Config } = {
   development: {
     client: "pg", // Conforme requisito técnico, estamos usando PostgreSQL.
     connection: {
-      host: "localhost",
-      port: 5432,
-      user: "admin",
-      password: "123456",
-      database: "ong_sol_encantado",
+      host: process.env.PG_HOST || "db",
+      port: Number(process.env.PG_PORT) || 5432,
+      user: process.env.PG_USER || "admin",
+      password: process.env.PG_PASSWORD || "123456",
+      database: process.env.PG_DB || "agenda_financeira",
+    },
+    // Pool de conexões para otimizar o uso do banco. O mínimo de conexões é 2 e o máximo é 10.
+    pool: {
+      min: 2,
+      max: 10,
     },
     migrations: {
       directory: "./src/database/migrations",

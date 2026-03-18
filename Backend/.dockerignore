@@ -1,0 +1,21 @@
+# Não copie as dependências locais (o Docker vai instalar as dele)
+node_modules
+npm-debug.log
+
+# Não copie o histórico do Git
+.git
+.gitignore
+
+# Não copie os arquivos de configuração do Docker para dentro do app
+Dockerfile
+Dockerfile.dev
+docker-compose.yml
+.dockerignore
+
+# Não copie a documentação pesada
+README.md
+docs/
+
+# Não copie o build do frontend para o container de desenvolvimento
+dist
+build

@@ -1,0 +1,20 @@
+FROM node:25-alpine
+
+# Instalamos o tsx globalmente para garantir que ele seja encontrado
+RUN npm install -g tsx
+
+WORKDIR /app
+
+# Copiamos apenas os arquivos de dependências primeiro (otimiza o cache)
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+# Damos permissão para o script de inicialização
+RUN chmod +x entrypoint.sh
+
+EXPOSE 3333
+
+# O entrypoint vai rodar as migrations antes de iniciar o servidor
+ENTRYPOINT ["./entrypoint.sh"]

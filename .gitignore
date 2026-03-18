@@ -1,6 +1,7 @@
 # Dependências (Nunca enviar, são pesadas e instaladas via npm install)
 node_modules/
 package-lock.json
+jspm_packages/
 
 # Compilação do TypeScript (Arquivos JS gerados a partir do TS)
 dist/
@@ -36,3 +37,7 @@ docker-volumes/
 # Sistema Operativo
 .DS_Store
 Thumbs.db
+
+# Banco de Dados Local (se você usar SQLite ou dumps)
+*.sqlite
+*.sql
