@@ -1,0 +1,17 @@
+# Usando a versão que combinamos para manter a simetria com o backend
+FROM node:25-alpine
+
+WORKDIR /app
+
+# Copia apenas os arquivos de dependências primeiro (otimiza o cache)
+COPY package*.json ./
+RUN npm install
+
+# Copia o restante dos arquivos do projeto
+COPY . .
+
+# Porta padrão do Vite
+EXPOSE 5173
+
+# O --host permite que o Nginx e o seu Windows acessem o servidor do Vite
+CMD ["npm", "run", "dev", "--", "--host"]

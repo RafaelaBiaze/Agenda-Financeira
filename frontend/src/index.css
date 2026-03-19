@@ -1,0 +1,23 @@
+/* Limpando as margens padrão do navegador */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  background-color: #ffffff !important; /* Força tudo a ficar branco */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Garante que o mouse sempre apareça nos campos de texto */
+input, textarea {
+  cursor: text !important;
+}
+
+/* Garante a mãozinha nos botões */
+button, .btn {
+  cursor: pointer !important;
+}
