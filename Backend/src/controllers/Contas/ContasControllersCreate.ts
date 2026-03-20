@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import ContasModel from '../../models/ContasModel.js';
+import ContasModel, {IConta} from '../../models/ContasModel.js';
 
 class ContasControllerCreate {
   async create(req: Request, res: Response) {
@@ -12,13 +12,13 @@ class ContasControllerCreate {
         }
         
         // 2. Mesclamos o ID do usuário com os dados vindos do corpo da requisição
-        const dadosDaConta = {
+        const dadosDaConta: IConta = {
             ...req.body,
             id_usuario: id_usuario_logado
         };
 
         // 3. Cria a nova conta associada ao usuário logado
-        const [novaConta] = await ContasModel.criar(dadosDaConta);
+        const novaConta = await ContasModel.criar(dadosDaConta);
         return res.json(novaConta);
     }
     catch(error){

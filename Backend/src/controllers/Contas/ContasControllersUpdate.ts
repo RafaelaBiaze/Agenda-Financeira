@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import ContasModel from '../../models/ContasModel.js';
+import ContasModel, {IConta} from '../../models/ContasModel.js';
 
 class ContasControllerUpdate {
   async update(req: Request, res: Response) {
@@ -26,7 +26,10 @@ class ContasControllerUpdate {
             return res.status(403).json({ erro: "Sem permissão para alterar esta conta" });
         }
 
-        const dadosParaAtualizar = { ...req.body };
+        const dadosParaAtualizar: IConta  = { 
+            ...req.body,
+            id_usuario: id_usuario_logado
+        };
 
         // 5. Atualiza a conta do usuário logado
         const [contaAtualizada] = await ContasModel.atualizar(Number(id), dadosParaAtualizar);

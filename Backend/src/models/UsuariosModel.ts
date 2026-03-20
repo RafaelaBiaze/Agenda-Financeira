@@ -1,7 +1,7 @@
 import connection from '../database/connection.js';
 
 // Esta interface garante que não esqueça nenhum campo
-export interface Usuario {
+export interface IUsuario {
   id_usuario?: number;
   nome: string;
   email: string;
@@ -13,13 +13,14 @@ export interface Usuario {
 
 class UsuariosModel {
   // Função para criar um novo usuário
-  async criar(usuario: Usuario) {
-    return connection("usuarios").insert(usuario).returning("*");
-  };
+  async criar(usuario: IUsuario): Promise<IUsuario> {
+    const [novoUsuario] = await connection<IUsuario>("usuarios").insert(usuario).returning("*");
+    return novoUsuario;
+  }
 
   // Função para buscar um usuário pelo email
-  async buscarPorEmail(email: string) {
-    return connection("usuarios").where({ email }).first();
+  async buscarPorEmail(email: string): Promise<IUsuario | undefined> {
+    return connection<IUsuario>("usuarios").where({ email }).first();
   }
 }
 

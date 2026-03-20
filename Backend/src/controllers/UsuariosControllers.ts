@@ -1,33 +1,40 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import UsuariosModel from "../models/UsuariosModel.js";
+import UsuariosModel, { IUsuario } from "../models/UsuariosModel.js"; // Importe a Interface
 
 export const UsuariosController = {
   async create(req: Request, res: Response) {
     try {
-      const { nome, email, senha } = req.body;
+      // 1. Tipamos o que vem do corpo da requisição
+      const { nome, email, senha, role }: IUsuario = req.body;
 
-      // 1. Criptografar a senha (Segurança em primeiro lugar!)
+      if (!senha) return res.status(400).json({ erro: "Senha é obrigatória" });
+
+      // 2. Criptografar a senha
       const salt = await bcrypt.genSalt(10);
       const senhaCriptografada = await bcrypt.hash(senha, salt);
 
-      // 2. Salvar no banco
-      const [novoUsuario] = await UsuariosModel.criar({
+      // 3. Salvar no banco
+      const novoUsuario = await UsuariosModel.criar({
         nome,
         email,
         senha: senhaCriptografada,
-        role: "user" // Por padrão, todo novo usuário é "user".
+        role: role || "user"
       });
 
+      // 4. Retorno sem a senha
       return res.status(201).json({ 
         mensagem: "Usuário criado com sucesso!",
-        usuario: { id: novoUsuario.id_usuario, 
-            nome, 
-            email,
-            role: "user"
+        usuario: { 
+          id: novoUsuario.id_usuario, 
+          nome: novoUsuario.nome, 
+          email: novoUsuario.email,
+          role: novoUsuario.role
         } 
       });
+
     } catch (error) {
+      console.error(error);
       return res.status(500).json({ erro: "Erro ao criar usuário" });
     }
   }

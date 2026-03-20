@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import CategoriasModel from '../../models/CategoriasModel.js';
+import CategoriasModel, {ICategoria} from '../../models/CategoriasModel.js';
 
 class CategoriasControllerUpdate {
   async update(req: Request, res: Response) {

@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import CategoriasModel from '../../models/CategoriasModel.js';
+import CategoriasModel, {ICategoria} from '../../models/CategoriasModel.js';
 
 class CategoriasControllerCreate {
   async create(req: Request, res: Response) {
@@ -13,7 +13,7 @@ class CategoriasControllerCreate {
         }
 
         // 3. Passamos apenas a string para o Model
-        const [novaCategoria] = await CategoriasModel.criar(nome_categoria);
+        const novaCategoria = await CategoriasModel.criar(nome_categoria);
 
         return res.status(201).json(novaCategoria);
     }

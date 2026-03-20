@@ -3,39 +3,58 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import UsuariosModel from "../models/UsuariosModel.js";
 
+// Tipar o que vem do corpo da requisição
+interface ILoginRequest {
+  email: string;
+  senha: string;
+}
+
 export const LoginController = {
   async login(req: Request, res: Response) {
     try {
-      const { email, senha, role } = req.body;
 
-      // 1. Verificar se o usuário existe
+      // 1. Pegamos apenas email e senha do corpo da requisição
+      const { email, senha }: ILoginRequest = req.body;
+
+      // 2. Buscar o usuário
       const usuario = await UsuariosModel.buscarPorEmail(email);
+      
       if (!usuario) {
         return res.status(401).json({ erro: "E-mail ou senha inválidos" });
       }
 
-      // 2. Comparar a senha digitada com a criptografada no banco
+      // 3. Comparar a senha
       const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+      
       if (!senhaCorreta) {
         return res.status(401).json({ erro: "E-mail ou senha inválidos" });
       }
 
-      // 3. Gerar o Token JWT (O Crachá)
-      const secret = process.env.SECRET_KEY || "chave_secreta"; // Usar váriavel de ambiente, porém colocar um valor padrão para evitar erros.
+      // 4. Gerar o Token JWT
+      const secret = process.env.SECRET_KEY || "chave_secreta";
       const token = jwt.sign(
-        { id: usuario.id_usuario, email: usuario.email, role: usuario.role }, // Dados que vão dentro do token
+        { 
+          id: usuario.id_usuario, // Use o ID que vem do banco
+          email: usuario.email, 
+          role: usuario.role      // Use o ROLE que vem do banco
+        }, 
         secret, 
-        { expiresIn: "30m" } // O token expira em 30 minutos por segurança
+        { expiresIn: "30m" }
       );
 
-      // 4. Retornar o token
+      // 5. Retornar os dados
       return res.json({
         mensagem: "Login realizado com sucesso!",
         token: token,
-        usuario: { nome: usuario.nome, email: usuario.email, role: usuario.role }
+        usuario: { 
+          nome: usuario.nome, 
+          email: usuario.email, 
+          role: usuario.role 
+        }
       });
 
     } catch (error) {
+      console.error(error);
       return res.status(500).json({ erro: "Erro ao realizar login" });
     }
   }

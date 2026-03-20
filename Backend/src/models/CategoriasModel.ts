@@ -8,23 +8,25 @@ export interface ICategoria {
 
 class CategoriaModel {
   // Função para listar todas as contas com os nomes das categorias
-  async listarTodas() {
-    return await connection('categorias').select('*').orderBy('nome_categoria', 'asc');
+  async listarTodas(): Promise<ICategoria[]> {
+    return await connection<ICategoria>('categorias')
+      .select('*')
+      .orderBy('nome_categoria', 'asc');
   }
 
   // Criar categoria nova
-  async criar(nome: string) {
-    return await connection('categorias').insert({ nome_categoria: nome }).returning('*');
+  async criar(nome: string): Promise<ICategoria[]> {
+    return await connection<ICategoria>('categorias').insert({ nome_categoria: nome }).returning('*');
   }
 
   // Buscar uma categoria específica
-  async buscarPorID(id: number) {
-    return await connection('categorias').where({'id_categoria': id}).first();
+  async buscarPorID(id: number): Promise<ICategoria | undefined> {
+    return await connection<ICategoria>('categorias').where({'id_categoria': id}).first();
   }
 
   // Atualiza os dados de uma categoria existente
-  async atualizar(id: number, nome: string) {
-    return await connection('categorias')
+  async atualizar(id: number, nome: string): Promise<ICategoria[]> {
+    return await connection<ICategoria>('categorias')
       .where('id_categoria', id)
       .update({ nome_categoria: nome })
       .returning('*');
@@ -32,7 +34,7 @@ class CategoriaModel {
 
   // Remove uma categoria do banco
   async excluir(id: number) {
-    return await connection('categorias')
+    return await connection<ICategoria>('categorias')
       .where('id_categoria', id)
       .delete();
   }

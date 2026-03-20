@@ -9,12 +9,13 @@ export interface IConta {
   status: 'pago' | 'pendente' | 'atrasado';
   id_categoria: number;
   id_responsavel: number;
+  id_usuario: number;
 }
 
 class ContasModel {
   // Função para listar todas as contas com os nomes das categorias
-  async listarTodas(id_usuario: number) {
-    return await connection('contas')
+  async listarTodas(id_usuario: number): Promise<(IConta & { nome_categoria: string; nome_responsavel: string })[]> {
+    return await connection<IConta>('contas')
       // 1. Especificamos que o ID é da tabela contas
       .where('contas.id_usuario', id_usuario)
 
@@ -29,29 +30,29 @@ class ContasModel {
   }
 
   // Criar conta nova
-  async criar(dados: IConta) {
-    return await connection('contas').insert(dados).returning('*');
+  async criar(dados: IConta): Promise<IConta[]> {
+    return await connection<IConta>('contas').insert(dados).returning('*');
   }
 
   // Buscar uma conta específica pelo ID
-  async buscarPorId(id: number, id_usuario: number) {
-    return await connection('contas').where({ 
+  async buscarPorId(id: number, id_usuario: number): Promise<IConta | undefined> {
+    return await connection<IConta>('contas').where({ 
       'id_conta': id,
       'id_usuario': id_usuario
     }).first();
   }
 
   // Atualiza os dados de uma conta existente
-  async atualizar(id: number, dados: Partial<IConta>) {
-    return await connection('contas')
+  async atualizar(id: number, dados: Partial<IConta>): Promise<IConta[]> {
+    return await connection<IConta>('contas')
       .where('id_conta', id)
       .update(dados)
       .returning('*');
   }
 
   // Remove uma conta do banco
-  async excluir(id: number) {
-    return await connection('contas')
+  async excluir(id: number): Promise<number> {
+    return await connection<IConta>('contas')
       .where('id_conta', id)
       .delete();
   }
