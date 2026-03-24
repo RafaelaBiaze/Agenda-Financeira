@@ -34,7 +34,6 @@ export const UsuariosController = {
       });
 
     } catch (error) {
-      console.error(error);
       return res.status(500).json({ erro: "Erro ao criar usuário" });
     }
   }

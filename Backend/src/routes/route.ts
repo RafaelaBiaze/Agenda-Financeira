@@ -4,6 +4,8 @@ import { LoginController } from '../controllers/LoginControllers.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
 
+import DashboardController from '../controllers/DashboardControllers.js';
+
 import ContasControllerCreate from '../controllers/Contas/ContasControllersCreate.js';
 import ContasControllerList from '../controllers/Contas/ContasControllersList.js';
 import ContasControllerListID from '../controllers/Contas/ContasControllersListID.js';
@@ -78,6 +80,9 @@ routes.post('/responsaveis', authMiddleware, isAdmin, ResponsaveisControllerCrea
 routes.put('/responsaveis/:id', authMiddleware, isAdmin, ResponsaveisControllerUpdate.update);
 // Remove um responsável existente
 routes.delete('/responsaveis/:id', authMiddleware, isAdmin, ResponsaveisControllerRemove.remove);
+
+// Dashboard
+routes.get('/dashboard/summary', authMiddleware, DashboardController.summary);
 
 // Quando o navegador acessar /usuarios, ele chama a função create do controller
 routes.post('/usuarios', authMiddleware, isAdmin, UsuariosController.create);

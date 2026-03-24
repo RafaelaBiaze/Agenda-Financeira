@@ -45,7 +45,7 @@ services:
       - .:/app
       - /app/node_modules # Impede que o Windows sobrescreva os módulos do Docker
     environment:
-      DATABASE_URL: postgresql://user:password@db:5432/agenda_financeira
+      DATABASE_URL: postgresql://${PG_USER}:${PG_PASSWORD}@db:5432/agenda_financeira
       PORT: 3333
     networks:
       - backend_network
