@@ -5,7 +5,7 @@ interface SidebarProps {
   onLogout: () => void;
 }
 
-export default function Sidebar({ role, onLogout }: SidebarProps) {
+export default function Sidebar({ role }: SidebarProps) {
   return (
     <div className="d-flex flex-column h-100 p-3">
     <nav className="nav flex-column p-3 gap-2">
@@ -55,18 +55,6 @@ export default function Sidebar({ role, onLogout }: SidebarProps) {
       </NavLink>
       )}
     </nav>
-    {/* 2. BOTÃO DE LOGOFF (Fica no rodapé da Sidebar) */}
-      {/* O 'mt-auto' empurra o botão para o final da div pai */}
-      <div className="mt-auto border-top pt-3">
-        <button 
-          onClick={onLogout} 
-          className="btn btn-link nav-link text-danger d-flex align-items-center gap-3 w-100 px-3"
-          style={{ textDecoration: 'none' }}
-        >
-          <i className="bi bi-box-arrow-left fs-5"></i>
-          <span className="fw-bold">Sair do Sistema</span>
-        </button>
-      </div>
-    </div> 
+  </div> 
   );
 }

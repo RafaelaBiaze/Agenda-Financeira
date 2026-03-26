@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import api from './services/api.ts';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import './assets/css/styles.css';
 
 // Importe seus componentes e páginas
 import MainLayout from './layouts/MainLayout';
