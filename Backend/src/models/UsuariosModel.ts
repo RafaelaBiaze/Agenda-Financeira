@@ -7,8 +7,8 @@ export interface IUsuario {
   email: string;
   senha: string;
   role: 'admin' | 'user';
-  data_criacao?: string;
-  data_atualizacao?: string;
+  criado_em?: string;
+  atualizado_em?: string;
 }
 
 class UsuariosModel {

@@ -11231,3 +11231,15 @@ body {
   font-size: 0.75rem;
   border-radius: 0.375rem !important;
 }
+
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto; /* Força o scroll se o conteúdo for maior */
+    -webkit-overflow-scrolling: touch; /* Sua linha de toque suave */
+}
+
+/* Isso garante que a tabela NÃO encolha para caber na tela */
+.table-responsive table {
+    min-width: 800px; /* Altere esse valor se sua tabela for muito larga */
+}

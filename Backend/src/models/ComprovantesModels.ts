@@ -2,11 +2,13 @@ import connection from '../database/connection.js';
 
 // Esta interface garante que não esqueça nenhum campo
 export interface IComprovantes {
-    id_comprovante?: number;
-    caminho_arquivo: string;
-    nome_original: string;
-    data_upload?: string;
-    id_conta: number;
+  id_comprovante?: number;
+  caminho_arquivo: string;
+  nome_original: string;
+  data_upload?: string;
+  id_conta: number;
+  criado_em?: string;
+  atualizado_em?: string;
 }
 
 class ComprovantesModel {
@@ -20,7 +22,7 @@ class ComprovantesModel {
     return await connection<IComprovantes>('comprovantes')
       .join('contas', 'comprovantes.id_conta', '=', 'contas.id_conta')
       .where('contas.id_usuario', id_usuario)
-      .select('comprovantes.*') // Seleciona apenas os campos do comprovante
+      .select('comprovantes.*')
       .orderBy('comprovantes.data_upload', 'desc');
   }
 
@@ -44,7 +46,10 @@ class ComprovantesModel {
   async atualizar(id: number, dados: Partial<IComprovantes>): Promise<IComprovantes[]> {
     return await connection<IComprovantes>('comprovantes')
         .where('id_comprovante', id)
-        .update(dados)
+        .update({
+          ...dados,
+          atualizado_em: connection.fn.now()
+        })
         .returning('*');
   }
 

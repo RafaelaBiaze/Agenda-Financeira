@@ -7,6 +7,8 @@ export interface IResponsavel {
   tipo: 'F' | 'J';
   documento: string;
   observacoes?: string;
+  criado_em?: string;
+  atualizado_em?: string;
 }
 
 class ResponsaveisModel {
@@ -29,7 +31,10 @@ class ResponsaveisModel {
   async atualizar(id: number, dados: Partial<IResponsavel>): Promise<IResponsavel[]> {
     return await connection<IResponsavel>('responsaveis')
       .where('id_responsavel', id)
-      .update(dados)
+      .update({
+        ...dados,
+        atualizado_em: connection.fn.now()
+      })
       .returning('*');
   }
 

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import api from '../services/api'; 
-import PizzaDashboard from '../components/PizzaDashboard';
+import React, { useState, useEffect } from 'react';
+import api from '../services/api';
 import NovaContaModal from '../components/NovaConta';
 
+// Tipagem dos dados
 interface DashboardData {
   pago: number;
   pendente: number;
@@ -19,137 +19,102 @@ interface DashboardData {
 
 const Dashboard: React.FC = () => {
   const [dados, setDados] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [filtro, setFiltro] = useState({
-    mes: new Date().getMonth() + 1,
-    ano: new Date().getFullYear()
-  });
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const listaMeses = Array.from({ length: 12 }, (_, i) => ({
-    valor: i + 1,
-    nome: new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(new Date(2026, i))
-  }));
+  // Carrega os dados do mês atual automaticamente ao entrar na tela
+  const carregarDados = () => {
+    api.get('/dashboard/summary')
+      .then(response => setDados(response.data))
+      .catch(error => console.error("Erro ao carregar dashboard:", error));
+  };
 
   useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      try {
-        const response = await api.get<DashboardData>('/dashboard/summary', { params: filtro });
-        setDados(response.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, [filtro]);
+    carregarDados();
+  }, []);
 
-  const metaMensal = 15000;
-  const porcentagemMeta = Math.min(((dados?.pago || 0) / metaMensal) * 100, 100);
-
-  if (loading) return <div className="text-center mt-5"><div className="spinner-border"></div></div>;
+  // Cálculos rápidos para o Dashboard de contas atrasadas
+  const contasAtrasadas = dados?.vencimentos.filter(v => new Date(v.data_vencimento) < new Date() && v.status !== 'pago') || [];
 
   return (
     <div className="container-fluid px-4">
-      {/* Cabeçalho */}
-      <h1 className="mt-4">Dashboard</h1>
       
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <ol className="breadcrumb mb-0">
-          <li className="breadcrumb-item active">Resumo Financeiro</li>
-        </ol>
-        
-        {/* Seletor de mês */}
-        <div className="d-flex gap-2">
-          <select className="form-select" value={filtro.mes} onChange={(e) => setFiltro({ ...filtro, mes: Number(e.target.value) })}>
-            {listaMeses.map(m => <option key={m.valor} value={m.valor}>{m.nome}</option>)}
-          </select>
-          <input type="number" className="form-control" style={{ width: '100px' }} value={filtro.ano} onChange={(e) => setFiltro({ ...filtro, ano: Number(e.target.value) })}/>
+      {/* 1. Cabeçalho padrão */}
+      <div className="d-flex justify-content-between align-items-center mt-4 mb-3">
+        <div>
+          <h1 className="mt-0 mb-2">Dashboard</h1>
+          <ol className="breadcrumb mb-0">
+            <li className="breadcrumb-item active">Visão Geral do Mês Atual</li>
+          </ol>
         </div>
+        <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+          <i className="fas fa-plus me-2"></i> Nova Conta
+        </button>
       </div>
 
-      {/* Cards */}
-      <div className="row mb-4" >
-        <div className="col-xl-4 col-md-6">
-          <div className="card bg-warning text-white mb-4 h-100">
-            <div className="card-body fw-bold fs-5">
-              Pendente: {dados?.pendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            </div>
-          </div>
-        </div>
-
-        <div className="col-xl-4 col-md-6">
-          <div className="card bg-success text-white mb-4 h-100">
-            <div className="card-body fw-bold fs-5">
-              Pago: {dados?.pago.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            </div>
-            <div className="card-footer bg-transparent border-top-0">
-               <div className="d-flex justify-content-between small text-white mb-1">
-                  <span>Meta do Mês</span>
-                  <span>{porcentagemMeta.toFixed(0)}%</span>
-               </div>
-               <div className="progress" style={{ height: '6px' }}>
-                 <div className="progress-bar bg-light" style={{ width: `${porcentagemMeta}%` }}></div>
-               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-xl-4 col-md-6">
-          <div className="card bg-danger text-white mb-4 h-100">
-            <div className="card-body fw-bold fs-5">
-              Em Atraso: {dados?.vencimentos?.filter(c => c.status !== 'pago' && new Date(c.data_vencimento) < new Date()).length} contas
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ÁREA DE GRÁFICOS E TABELAS */}
+      {/* 2. Cards */}
       <div className="row">
-        {/* GRÁFICO NA ESQUERDA */}
-        <div className="col-xl-6">
-          <div className="card mb-4">
-            <div className="card-header">
-              <i className="fas fa-chart-pie me-1"></i>
-              Síntese de Movimentações
-            </div>
-            <div className="card-body d-flex justify-content-center">
-              {/* SEU COMPONENTE DO CHART.JS ENTRA AQUI! */}
-              <div style={{ width: '70%' }}>
-                 <PizzaDashboard dadosGrafico={[dados?.pago || 0, dados?.pendente || 0]} />
-              </div>
+        
+        <div className="col-xl-4 col-md-6 mb-4">
+          <div className="card bg-success text-white h-100 shadow-sm border-0">
+            <div className="card-body">
+              <div className="small text-white-50">Total Pago</div>
+              <div className="fs-4 fw-bold">{dados?.pago.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
             </div>
           </div>
         </div>
 
-        {/* AÇÕES RÁPIDAS NA DIREITA */}
-        <div className="col-xl-6">
-           <div className="card mb-4">
-            <div className="card-header">
-              <i className="fas fa-bolt me-1"></i>
-              Ações Rápidas
-            </div>
+        <div className="col-xl-4 col-md-6 mb-4">
+          <div className="card bg-warning text-white h-100 shadow-sm border-0">
             <div className="card-body">
-               <button className="btn btn-primary w-100 mb-3" onClick={() => setIsModalOpen(true)}><i className="fas fa-plus me-2"></i> Cadastrar Nova Conta</button>
-               <button className="btn btn-outline-secondary w-100"><i className="fas fa-upload me-2"></i> Anexar Comprovante</button>
+              <div className="small text-white-50">Pendente (A Vencer)</div>
+              <div className="fs-4 fw-bold">{dados?.pendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-xl-4 col-md-6 mb-4">
+          <div className="card bg-danger text-white h-100 shadow-sm border-0">
+            <div className="card-body">
+              <div className="small text-white-50">Em Atraso</div>
+              <div className="fs-4 fw-bold">{contasAtrasadas.length} contas</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* TABELA DE VENCIMENTOS (Adapte o seu HTML da tabela aqui com a classe table-bordered) */}
-      <div className="card mb-4">
-        <div className="card-header">
-          <i className="fas fa-table me-1"></i>
-          Agenda de Vencimentos do Mês
+      {/* 3. Gráficos */}
+      <div className="row">
+        <div className="col-xl-6">
+          <div className="card mb-4 shadow-sm border-0">
+            <div className="card-header bg-white py-3">
+              <i className="fas fa-chart-area me-1 text-secondary"></i> Fluxo de Caixa
+            </div>
+            <div className="card-body text-center text-muted py-5" style={{ height: '250px' }}>
+              Gráfico de Área (Em breve)
+            </div>
+          </div>
+        </div>
+        <div className="col-xl-6">
+          <div className="card mb-4 shadow-sm border-0">
+            <div className="card-header bg-white py-3">
+              <i className="fas fa-chart-bar me-1 text-secondary"></i> Despesas por Categoria
+            </div>
+            <div className="card-body text-center text-muted py-5" style={{ height: '250px' }}>
+              Gráfico de Barras (Em breve)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Tabelas de contas */}
+      <div className="card mb-4 shadow-sm border-0">
+        <div className="card-header bg-white py-3">
+          <i className="fas fa-table me-1 text-secondary"></i> Agenda de Vencimentos do Mês
         </div>
         <div className="card-body">
           <div className="table-responsive">
-            <table className="table table-bordered text-nowrap">
-              <thead>
+            <table className="table table-bordered table-hover align-middle text-nowrap mb-0">
+              <thead className="table-light">
                 <tr>
                   <th>Descrição</th>
                   <th>Valor</th>
@@ -159,46 +124,41 @@ const Dashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {dados?.vencimentos.map(v => (
-                  <tr key={v.id_conta}>
-                    <td>{v.descricao}</td>
-                    <td>{v.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                    <td>{new Date(v.data_vencimento).toLocaleDateString('pt-BR', { timeZone : 'UTC' })}</td>
-                    <td>
-                      <span className={`badge ${v.status === 'pago' ? 'bg-success' : (new Date(v.data_vencimento) < new Date() ? 'bg-danger' : 'bg-warning')}`}>
-                        {v.status === 'pago' ? 'Pago' : (new Date(v.data_vencimento) < new Date() ? 'Atrasado' : 'Pendente')}
-                      </span>
-                    </td>
-                    <td>{v.responsavel_nome}</td>
+                {dados?.vencimentos && dados.vencimentos.length > 0 ? (
+                  dados.vencimentos.map(v => (
+                    <tr key={v.id_conta}>
+                      <td className="fw-medium text-dark">{v.descricao}</td>
+                      <td>{v.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                      <td>{new Date(v.data_vencimento).toLocaleDateString('pt-BR', { timeZone : 'UTC' })}</td>
+                      <td>
+                        <span className={`badge ${v.status === 'pago' ? 'bg-success' : (new Date(v.data_vencimento) < new Date() ? 'bg-danger' : 'bg-warning text-dark')}`}>
+                          {v.status === 'pago' ? 'Pago' : (new Date(v.data_vencimento) < new Date() ? 'Atrasado' : 'Pendente')}
+                        </span>
+                      </td>
+                      <td className="text-muted">{v.responsavel_nome}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="text-center py-4 text-muted">Nenhuma conta cadastrada para este mês.</td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
-          </div> 
-            <nav aria-label="Page navigation example" className="mt-3">
-              <ul className="pagination justify-content-end mb-0">
-                <li className="page-item disabled">
-                  <a className="page-link" href="#" tabIndex={-1}>Previous</a>
-                </li>
-                <li className="page-item"><a className="page-link" href="#">1</a></li>
-                <li className="page-item"><a className="page-link" href="#">2</a></li>
-                <li className="page-item"><a className="page-link" href="#">3</a></li>
-                <li className="page-item">
-                  <a className="page-link" href="#">Next</a>
-                </li>
-              </ul>
-            </nav>
+          </div>
         </div>
       </div>
-      {/* O MODAL FICA AQUI */}
+
+      {/* Modal criar conta nova */}
       <NovaContaModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         onSuccess={() => {
           setIsModalOpen(false);
-          // TODO: Aqui vamos recarregar os dados da API depois!
+          carregarDados(); // Recarrega a tela automaticamente após salvar
         }} 
       />
+
     </div>
   );
 };

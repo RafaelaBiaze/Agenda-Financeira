@@ -4,6 +4,8 @@ import connection from '../database/connection.js';
 export interface ICategoria {
   id_categoria?: number;
   nome_categoria: string;
+  criado_em?: string;
+  atualizado_em?: string;
 }
 
 class CategoriaModel {
@@ -28,7 +30,9 @@ class CategoriaModel {
   async atualizar(id: number, nome: string): Promise<ICategoria[]> {
     return await connection<ICategoria>('categorias')
       .where('id_categoria', id)
-      .update({ nome_categoria: nome })
+      .update({ nome_categoria: nome,
+        atualizado_em: connection.fn.now()
+      })
       .returning('*');
   }
 

@@ -4,7 +4,7 @@ import api from '../services/api';
 interface NovaContaModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void; // Recarregar página
+  onSuccess: () => void;
 }
 
 interface Responsavel {
@@ -12,16 +12,22 @@ interface Responsavel {
   nome: string;
 }
 
+interface Categoria {
+  id_categoria: number;
+  nome_categoria: string;
+}
+
 const NovaContaModal: React.FC<NovaContaModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [listaResponsaveis, setListaResponsaveis] = useState<Responsavel[]>([]);
+  const [listaCategorias, setListaCategorias] = useState<Categoria[]>([]);
   // Estado para guardar o que o usuário digita
   const [formData, setFormData] = useState({
     descricao: '',
     valor: '',
     data_vencimento: '',
     status: '',
-    id_categoria: 1, // Fixado temporariamente até criarmos o select de categorias
-    id_responsavel: 1 // Fixado temporariamente
+    id_categoria: 1,
+    id_responsavel: 1 
   });
 
   useEffect(() => {
@@ -34,6 +40,16 @@ const NovaContaModal: React.FC<NovaContaModalProps> = ({ isOpen, onClose, onSucc
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      api.get('/categorias')
+        .then(response => {
+          setListaCategorias(response.data);
+        })
+        .catch(err => console.error("Erro ao carregar categorias:", err));
+    }
+  }, [isOpen]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -42,6 +58,7 @@ const NovaContaModal: React.FC<NovaContaModalProps> = ({ isOpen, onClose, onSucc
     e.preventDefault();
     try {
     await api.post('/contas', formData);
+    alert("Conta cadastrada com sucesso!");
     
     // Se não der erro, limpamos o formulário para o próximo uso
     setFormData({
@@ -58,8 +75,7 @@ const NovaContaModal: React.FC<NovaContaModalProps> = ({ isOpen, onClose, onSucc
     onClose();
 
     } catch (error) {
-        console.error("Erro ao enviar dados para a API", error);
-        alert("Ocorreu um erro ao salvar a conta. Verifique o console.");
+      alert("Ocorreu um erro ao salvar a conta. Verifique o console.");
     }
   };
 
@@ -136,6 +152,18 @@ const NovaContaModal: React.FC<NovaContaModalProps> = ({ isOpen, onClose, onSucc
                     {listaResponsaveis.map(resp => (
                       <option key={resp.id_responsavel} value={resp.id_responsavel}>
                         {resp.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="col-md-8 mb-3">
+                  <label className="form-label fw-bold text-secondary small">Categoria</label>
+                  <select className="form-select shadow-sm" name="id_responsavel" value={formData.id_categoria} onChange={handleChange} required>
+                    <option value="" disabled>Selecione...</option>
+                    {listaCategorias.map(cat => (
+                      <option key={cat.id_categoria} value={cat.id_categoria}>
+                        {cat.nome_categoria}
                       </option>
                     ))}
                   </select>
