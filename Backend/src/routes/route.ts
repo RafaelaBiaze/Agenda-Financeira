@@ -1,10 +1,15 @@
 import { Router } from 'express';
-import { UsuariosController } from '../controllers/UsuariosControllers.js';
 import { LoginController } from '../controllers/LoginControllers.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
 
 import DashboardController from '../controllers/DashboardControllers.js';
+
+import UsuariosControllerCreate from '../controllers/Usuarios/UsuariosControllersCreate.js';
+import UsuariosControllerList from '../controllers/Usuarios/UsuariosControllersList.js';
+import UsuariosControllerListID from '../controllers/Usuarios/UsuariosControllersListID.js';
+import UsuariosControllerUpdate from '../controllers/Usuarios/UsuariosControllersUpdate.js';
+import UsuariosControllerRemove from '../controllers/Usuarios/UsuariosControllersRemove.js';
 
 import ContasControllerCreate from '../controllers/Contas/ContasControllersCreate.js';
 import ContasControllerList from '../controllers/Contas/ContasControllersList.js';
@@ -29,6 +34,7 @@ import ComprovantesControllersList from '../controllers/Comprovantes/Comprovante
 import ComprovantesControllersListID from '../controllers/Comprovantes/ComprovantesControllersListID.js';
 import ComprovantesControllersUpdate from '../controllers/Comprovantes/ComprovantesControllersUpdate.js';
 import ComprovantesControllerRemove from '../controllers/Comprovantes/ComprovantesControllersRemove.js';
+import UsuariosControllersCreate from '../controllers/Usuarios/UsuariosControllersCreate.js';
 
 const routes = Router();
 
@@ -84,8 +90,18 @@ routes.delete('/responsaveis/:id', authMiddleware, isAdmin, ResponsaveisControll
 // Dashboard
 routes.get('/dashboard/summary', authMiddleware, DashboardController.summary);
 
+// Usuários
 // Quando o navegador acessar /usuarios, ele chama a função create do controller
-routes.post('/usuarios', authMiddleware, isAdmin, UsuariosController.create);
+routes.post('/usuarios', authMiddleware, isAdmin, UsuariosControllersCreate.create);
+// Lista todos os usuários
+routes.get('/usuarios', authMiddleware, isAdmin, UsuariosControllerList.list);
+// Lista um usuário específico
+routes.get('/usuarios/:id', authMiddleware, isAdmin, UsuariosControllerListID.listID);
+// Edita um usuário existente
+routes.put('/usuarios/:id', authMiddleware, isAdmin, UsuariosControllerUpdate.update);
+// Remove um usuário existente
+routes.delete('/usuarios/:id', authMiddleware, isAdmin, UsuariosControllerRemove.remove);
+
 
 // Login
 routes.post('/login', LoginController.login);
