@@ -14,10 +14,17 @@ interface IResponsavel {
   observacoes?: string;
 }
 
+interface IUsuario {
+  id_usuario?: number;
+  nome: string;
+  email: string;
+  senha: string;
+  role: 'admin' | 'user';
+}
+
 const Configuracoes: React.FC = () => {
   const [abaAtiva, setAbaAtiva] = useState<'usuarios' | 'categorias' | 'responsaveis'>('categorias');
 
-  
   // Estados para Categorias
   const [categorias, setCategorias] = useState<ICategoria[]>([]);
   const [novaCategoria, setNovaCategoria] = useState('');
@@ -30,10 +37,21 @@ const Configuracoes: React.FC = () => {
   const [tipoResponsavel, setTipoResponsavel] = useState<'F' | 'J'>('F');
   const [documentoResponsavel, setDocumentoResponsavel] = useState('');
   const [observacoesResponsavel, setObservacoesResponsavel] = useState('');
+
+  // Estados para Usuários
+  const [usuarios, setUsuarios] = useState<IUsuario[]>([]);
   
-  // Estados para edição de responsáveis
+  // Campos para cadastro de Usuários
+  const [nomeUsuario, setNomeUsuario] = useState('');
+  const [emailUsuario, setEmailUsuario] = useState('');
+  const [senhaUsuario, setSenhaUsuario] = useState('');
+  const [roleUsuario, setRoleUsuario] = useState<'admin' | 'user'>('user');
+  
+  // Estados para edição
   const [idEditando, setIdEditando] = useState<number | null>(null);
-  const [dadosEdicao, setDadosEdicao] = useState<IResponsavel | null>(null);
+  const [dadosEdicaoResponsavel, setDadosEdicaoResponsavel] = useState<IResponsavel | null>(null);
+  const [dadosEdicaoUsuario, setDadosEdicaoUsuario] = useState<IUsuario | null>(null);
+  const [dadosEdicaoCategoria, setDadosEdicaoCategoria] = useState<ICategoria | null>(null);
   
   useEffect(() => {
     carregarDados();
@@ -45,10 +63,15 @@ const Configuracoes: React.FC = () => {
         const response = await api.get('/categorias');
         setCategorias(response.data);
       }
-      // Aqui vocês implementarão os outros GETs (usuarios e responsaveis)
+
       if (abaAtiva === 'responsaveis') {
         const response = await api.get('/responsaveis');
         setResponsaveis(response.data);
+      }
+
+      if (abaAtiva === 'usuarios') {
+        const response = await api.get('/usuarios');
+        setUsuarios(response.data);
       }
     } catch (err) {
       console.error("Erro ao carregar dados", err);
@@ -90,6 +113,28 @@ const Configuracoes: React.FC = () => {
     }
   }
   
+  // Função para adicionar novo usuário
+  async function handleAddUsuario(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await api.post('/usuarios', {
+        nome: nomeUsuario,
+        email: emailUsuario,
+        senha: senhaUsuario,
+        role: roleUsuario
+      });
+      // Limpa os campos
+      setNomeUsuario('');
+      setEmailUsuario('');
+      setSenhaUsuario('');
+      setRoleUsuario('user');
+      carregarDados(); // Recarrega a lista
+      alert("Usuário adicionado!");
+    } catch (err) {
+      alert("Erro ao salvar usuário.");
+    }
+  }
+  
   // Função para excluir responsavel
   async function handleDeleteResponsavel(id: number) {
     if (!window.confirm("Tem certeza que deseja excluir este responsável?")) return;
@@ -101,30 +146,100 @@ const Configuracoes: React.FC = () => {
       alert("Erro ao excluir responsável.");
     }
   }
+
+  // Função para excluir usuário
+  async function handleDeleteUsuario(id: number) {
+    if (!window.confirm("Tem certeza que deseja excluir este usuário?")) return;
+    try {      
+      await api.delete(`/usuarios/${id}`);
+      carregarDados();
+      alert("Usuário excluído!");
+    } catch (err) {
+      alert("Erro ao excluir usuário.");
+    }
+  }
   
+  // Função para excluir categoria
+  async function handleDeleteCategoria(id: number) {
+    if (!window.confirm("Tem certeza que deseja excluir esta categoria?")) return;
+    try {
+      await api.delete(`/categorias/${id}`);
+      carregarDados(); // Recarrega a lista
+      alert("Categoria excluída!");
+    } catch (err) {
+      alert("Erro ao excluir categoria.");
+    }
+  }
+
   // Prepara a linha para edição
-  const iniciarEdicao = (res: IResponsavel) => {
+  const iniciarEdicaoResponsavel = (res: IResponsavel) => {
     setIdEditando(res.id_responsavel!);
-    setDadosEdicao({ ...res }); // Clona os dados atuais para o estado temporário
+    setDadosEdicaoResponsavel({ ...res }); // Clona os dados atuais para o estado temporário
+  };
+
+  const iniciarEdicaoUsuario = (res: IUsuario) => {
+    setIdEditando(res.id_usuario!);
+    setDadosEdicaoUsuario({ ...res, senha: '' }); // Clona os dados atuais para o estado temporário
+  };
+
+  const iniciarEdicaoCategoria = (res: ICategoria) => {
+    setIdEditando(res.id_categoria!);
+    setDadosEdicaoCategoria({ ...res }); // Clona os dados atuais para o estado temporário
   };
 
   // Cancela e limpa
-  const cancelarEdicao = () => {
+  const cancelarEdicaoResponsavel = () => {
     setIdEditando(null);
-    setDadosEdicao(null);
+    setDadosEdicaoResponsavel(null);
+  };
+
+  const cancelarEdicaoUsuario = () => {
+    setIdEditando(null);
+    setDadosEdicaoUsuario(null);
+  };
+
+  const cancelarEdicaoCategoria = () => {
+    setIdEditando(null);
+    setDadosEdicaoCategoria(null);
   };
 
   // Salva a edição da linha
-  async function handleSalvarEdicao() {
-    if (!dadosEdicao || !dadosEdicao.id_responsavel) return;
+  async function handleSalvarEdicaoResponsavel() {
+    if (!dadosEdicaoResponsavel || !dadosEdicaoResponsavel.id_responsavel) return;
     try {
-      await api.put(`/responsaveis/${dadosEdicao.id_responsavel}`, dadosEdicao);
+      await api.put(`/responsaveis/${dadosEdicaoResponsavel.id_responsavel}`, dadosEdicaoResponsavel);
       setIdEditando(null);
-      setDadosEdicao(null);
+      setDadosEdicaoResponsavel(null);
       carregarDados(); // Recarrega a lista atualizada
       alert("Responsável atualizado!");
     } catch (err) {
       alert("Erro ao atualizar responsável.");
+    }
+  }
+
+  async function handleSalvarEdicaoUsuario() {
+    if (!dadosEdicaoUsuario || !dadosEdicaoUsuario.id_usuario) return;
+    try {
+      await api.put(`/usuarios/${dadosEdicaoUsuario.id_usuario}`, dadosEdicaoUsuario);
+      setIdEditando(null);
+      setDadosEdicaoUsuario(null);
+      carregarDados(); // Recarrega a lista atualizada
+      alert("Usuário atualizado!");
+    } catch (err) {
+      alert("Erro ao atualizar usuário.");
+    }
+  }
+
+  async function handleSalvarEdicaoCategoria() {
+    if (!dadosEdicaoCategoria || !dadosEdicaoCategoria.id_categoria) return;
+    try {
+      await api.put(`/categorias/${dadosEdicaoCategoria.id_categoria}`, dadosEdicaoCategoria);
+      setIdEditando(null);
+      setDadosEdicaoCategoria(null);
+      carregarDados(); 
+      alert("Categoria atualizada com sucesso!");
+    } catch (err) {
+      alert("Erro ao atualizar a categoria.");
     }
   }
 
@@ -155,7 +270,7 @@ const Configuracoes: React.FC = () => {
             className={`nav-link ${abaAtiva === 'usuarios' ? 'active bg-warning text-dark' : 'text-secondary'}`}
             onClick={() => setAbaAtiva('usuarios')}
           >
-            Usuários (Admin)
+            Usuários
           </button>
         </li>
       </ul>
@@ -170,7 +285,7 @@ const Configuracoes: React.FC = () => {
               <input 
                 type="text" 
                 className="form-control" 
-                placeholder="Ex: Alimentação, Aluguel..." 
+                placeholder="Nome da categoria" 
                 value={novaCategoria}
                 onChange={(e) => setNovaCategoria(e.target.value)}
                 required
@@ -190,10 +305,44 @@ const Configuracoes: React.FC = () => {
                 {categorias.map(cat => (
                   <tr key={cat.id_categoria}>
                     <td>{cat.id_categoria}</td>
-                    <td>{cat.nome_categoria}</td>
-                    <td className="text-end">
-                      <button className="btn btn-sm btn-outline-danger">Excluir</button>
-                    </td>
+                    {idEditando === cat.id_categoria ? (
+                      <>
+                        <td>
+                          <input 
+                            type="text" 
+                            className="form-control form-control-sm"
+                            value={dadosEdicaoCategoria?.nome_categoria || ''}
+                            onChange={e => setDadosEdicaoCategoria({...dadosEdicaoCategoria!, nome_categoria: e.target.value})}
+                          />
+                        </td>
+                        <td className="text-end">
+                          <button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoCategoria}>
+                            Salvar
+                          </button>
+                          <button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoCategoria}>
+                            Cancelar
+                          </button>
+                        </td>
+                      </>
+                    ) : (
+                    <>
+                      <td>{cat.nome_categoria}</td> 
+                      <td className="text-end"> 
+                        <button 
+                            className="btn btn-sm btn-outline-primary me-2" 
+                            onClick={() => iniciarEdicaoCategoria(cat)}
+                          >
+                            Editar
+                        </button>
+                        <button 
+                          className="btn btn-sm btn-outline-danger" 
+                          onClick={() => handleDeleteCategoria(cat.id_categoria!)}
+                        >
+                          Excluir
+                        </button>
+                      </td>
+                    </>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -208,7 +357,7 @@ const Configuracoes: React.FC = () => {
               <input 
                 type="text" 
                 className="form-control" 
-                placeholder="Ex: João, Maria..." 
+                placeholder="Nome do Responsável" 
                 value={nomeResponsavel}
                 onChange={(e) => setNomeResponsavel(e.target.value)}
                 required
@@ -260,15 +409,15 @@ const Configuracoes: React.FC = () => {
                           <input 
                             type="text" 
                             className="form-control form-control-sm"
-                            value={dadosEdicao?.nome || ''}
-                            onChange={e => setDadosEdicao({...dadosEdicao!, nome: e.target.value})}
+                            value={dadosEdicaoResponsavel?.nome || ''}
+                            onChange={e => setDadosEdicaoResponsavel({...dadosEdicaoResponsavel!, nome: e.target.value})}
                           />
                         </td>
                         <td>
                           <select 
                             className="form-select form-select-sm"
-                            value={dadosEdicao?.tipo}
-                            onChange={e => setDadosEdicao({...dadosEdicao!, tipo: e.target.value as 'F' | 'J'})}
+                            value={dadosEdicaoResponsavel?.tipo}
+                            onChange={e => setDadosEdicaoResponsavel({...dadosEdicaoResponsavel!, tipo: e.target.value as 'F' | 'J'})}
                           >
                             <option value="F">F</option>
                             <option value="J">J</option>
@@ -278,23 +427,23 @@ const Configuracoes: React.FC = () => {
                           <input 
                             type="text" 
                             className="form-control form-control-sm"
-                            value={dadosEdicao?.documento || ''}
-                            onChange={e => setDadosEdicao({...dadosEdicao!, documento: e.target.value})}
+                            value={dadosEdicaoResponsavel?.documento || ''}
+                            onChange={e => setDadosEdicaoResponsavel({...dadosEdicaoResponsavel!, documento: e.target.value})}
                           />
                         </td>
                         <td>
                           <input 
                             type="text" 
                             className="form-control form-control-sm"
-                            value={dadosEdicao?.observacoes || ''}
-                            onChange={e => setDadosEdicao({...dadosEdicao!, observacoes: e.target.value})}
+                            value={dadosEdicaoResponsavel?.observacoes || ''}
+                            onChange={e => setDadosEdicaoResponsavel({...dadosEdicaoResponsavel!, observacoes: e.target.value})}
                           />
                         </td>
                         <td className="text-end">
-                          <button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicao}>
+                          <button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoResponsavel}>
                             Salvar
                           </button>
-                          <button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicao}>
+                          <button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoResponsavel}>
                             Cancelar
                           </button>
                         </td>
@@ -308,7 +457,7 @@ const Configuracoes: React.FC = () => {
                         <td className="text-end">
                           <button 
                             className="btn btn-sm btn-outline-primary me-2" 
-                            onClick={() => iniciarEdicao(res)}
+                            onClick={() => iniciarEdicaoResponsavel(res)}
                           >
                             Editar
                           </button>
@@ -329,8 +478,132 @@ const Configuracoes: React.FC = () => {
         )}
 
         {abaAtiva === 'usuarios' && (
-          <div className="text-center py-5">
-            <p className="text-muted">Espaço reservado para o cadastro de Usuários (Pair Programming)</p>
+          <div>
+            <h5 className="fw-bold mb-3">Gerenciar Usuários</h5>
+            <form onSubmit={handleAddUsuario} className="d-flex gap-2 mb-4">
+              <input 
+                type="text" 
+                className="form-control" 
+                placeholder="Nome do Usuário" 
+                value={nomeUsuario}
+                onChange={(e) => setNomeUsuario(e.target.value)}
+                required
+              />
+              <input 
+                type="text" 
+                className="form-control"
+                placeholder="Email"
+                value={emailUsuario}
+                onChange={(e) => setEmailUsuario(e.target.value)}
+                required
+              />
+              <input 
+                type="text" 
+                className="form-control"
+                placeholder="Senha"
+                value={senhaUsuario}
+                onChange={(e) => setSenhaUsuario(e.target.value)}
+                required
+              />
+              <select 
+                className="form-select" 
+                value={roleUsuario}
+                onChange={(e) => setRoleUsuario(e.target.value as 'admin' | 'user')}
+                >
+                  <option value="admin">Administrador</option>
+                  <option value="user">Usuário</option>
+              </select>
+              <button type="submit" className="btn btn-dark fw-bold">+ Adicionar</button>
+            </form>
+
+            <table className="table table-hover">
+              <thead className="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Nome do Usuário</th>
+                  <th>Email</th>
+                  <th>Senha</th>
+                  <th>Role</th>
+                  <th className="text-end">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {usuarios.map(res => (
+                  <tr key={res.id_usuario}>
+                    <td>{res.id_usuario}</td>
+                    
+                    {idEditando === res.id_usuario ? (
+                      <>
+                        <td>
+                          <input 
+                            type="text" 
+                            className="form-control form-control-sm"
+                            value={dadosEdicaoUsuario?.nome || ''}
+                            onChange={e => setDadosEdicaoUsuario({...dadosEdicaoUsuario!, nome: e.target.value})}
+                          />
+                        </td>
+                        <td>
+                          <input 
+                            type="email" 
+                            className="form-control form-control-sm"
+                            value={dadosEdicaoUsuario?.email || ''}
+                            onChange={e => setDadosEdicaoUsuario({...dadosEdicaoUsuario!, email: e.target.value})}
+                          />
+                        </td>
+                        <td>
+                          <input 
+                            type="password"
+                            className="form-control form-control-sm"
+                            placeholder="Nova senha (ou vazio)"
+                            value={dadosEdicaoUsuario?.senha || ''}
+                            onChange={e => setDadosEdicaoUsuario({...dadosEdicaoUsuario!, senha: e.target.value})}
+                          />
+                        </td>
+                        <td>
+                          <select 
+                            className="form-select form-select-sm"
+                            value={dadosEdicaoUsuario?.role || 'user'}
+                            onChange={e => setDadosEdicaoUsuario({...dadosEdicaoUsuario!, role: e.target.value as 'admin' | 'user'})}
+                          >
+                            <option value="admin">admin</option>
+                            <option value="user">user</option>
+                          </select>
+                        </td>
+                        <td className="text-end">
+                          <button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoUsuario}>
+                            Salvar
+                          </button>
+                          <button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoUsuario}>
+                            Cancelar
+                          </button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td>{res.nome}</td>
+                        <td>{res.email}</td>
+                        <td className="text-muted" title="Senha protegida">••••••••</td> {/* Esconder a senha */}
+                        <td><span className={`badge ${res.role === 'admin' ? 'bg-info text-dark' : 'bg-secondary'}`}>{res.role}</span></td>
+                        <td className="text-end">
+                          <button 
+                            className="btn btn-sm btn-outline-primary me-2" 
+                            onClick={() => iniciarEdicaoUsuario(res)}
+                          >
+                            Editar
+                          </button>
+                          <button 
+                            className="btn btn-sm btn-outline-danger" 
+                            onClick={() => handleDeleteUsuario(res.id_usuario!)}
+                          >
+                            Excluir
+                          </button>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 
