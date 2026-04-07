@@ -80,6 +80,14 @@ const ModalEditarConta: React.FC<ModalEditarProps> = ({ isOpen, onClose, onSucce
                 </div>
               </div>
               <div className="mb-3">
+                <label className="form-label small fw-bold">Status</label>
+                <select className="form-select" value={formData.status} 
+                  onChange={e => setFormData({...formData, status: e.target.value})} required>
+                  <option value="pendente">Pendente</option>
+                  <option value="pago">Pago</option>
+                </select>
+              </div>
+              <div className="mb-3">
                 <label className="form-label small fw-bold">Responsável</label>
                 <select className="form-select" value={formData.id_responsavel} 
                   onChange={e => setFormData({...formData, id_responsavel: e.target.value})} required>

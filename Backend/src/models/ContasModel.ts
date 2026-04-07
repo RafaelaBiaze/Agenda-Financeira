@@ -1,5 +1,5 @@
 import connection from '../database/connection.js';
-import { startOfMonth, endOfMonth, startOfYear, endOfYear, format } from 'date-fns';
+import { startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths,format } from 'date-fns';
 
 // Esta interface garante que não esqueça nenhum campo
 export interface IConta {
@@ -140,6 +140,58 @@ class ContasModel {
       .where('id_conta', id)
       .delete();
   }
+
+  // Função para obter o resumo do dashboard (valores e dados dos gráficos)
+  async obterResumoDashboard(id_usuario: number, mes: number, ano: number) {
+    const dataAlvo = new Date(ano, mes - 1, 1);
+    const inicioMes = format(startOfMonth(dataAlvo), 'yyyy-MM-dd 00:00:00');
+    const fimMes = format(endOfMonth(dataAlvo), 'yyyy-MM-dd 23:59:59');
+
+    // 1. Cards
+    const resumoGeral = await connection('contas')
+      .where('id_usuario', id_usuario)
+      .select(
+        connection.raw("SUM(CASE WHEN status = 'pago' THEN valor ELSE 0 END) as total_pago"),
+        connection.raw("SUM(CASE WHEN status = 'pendente' THEN valor ELSE 0 END) as total_pendente"),
+        // Contas que não estão pagas E a data já passou de hoje
+        connection.raw("COUNT(CASE WHEN status = 'pendente' AND data_vencimento < CURRENT_DATE THEN 1 END) as qtd_atrasadas")
+      )
+      .first();
+
+    // 2. Gráfico de Categorias (Total acumulado por categoria)
+    const categorias = await connection('contas')
+      .select('categorias.nome_categoria as label')
+      .sum('contas.valor as total')
+      .join('categorias', 'contas.id_categoria', 'categorias.id_categoria')
+      .where('contas.id_usuario', id_usuario)
+      .groupBy('categorias.nome_categoria');
+
+    // 3. Gráfico de Evolução (Mantemos os últimos 6 meses para não poluir o visual)
+    const seisMesesAtras = format(startOfMonth(subMonths(new Date(), 5)), 'yyyy-MM-dd 00:00:00');
+    
+    const evolucao = await connection('contas')
+      .select(connection.raw("TO_CHAR(data_vencimento, 'MM/YYYY') as mes_ano"))
+      .sum('valor as total')
+      .where('id_usuario', id_usuario)
+      .where('data_vencimento', '>=', seisMesesAtras)
+      .groupBy('mes_ano')
+      .orderByRaw("MIN(data_vencimento) ASC");
+
+    return {
+      pago: Number(resumoGeral?.total_pago || 0),
+      pendente: Number(resumoGeral?.total_pendente || 0),
+      qtdAtrasadas: Number(resumoGeral?.qtd_atrasadas || 0),
+      graficoCategorias: {
+        labels: categorias.map(c => c.label),
+        valores: categorias.map(c => Number(c.total))
+      },
+      graficoEvolucao: {
+        labels: evolucao.map(e => (e as any).mes_ano),
+        valores: evolucao.map(e => Number(e.total))
+      }
+    };
+  }
+
 }
 
 export default new ContasModel();
