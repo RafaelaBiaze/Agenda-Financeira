@@ -159,7 +159,7 @@ const NovaContaModal: React.FC<NovaContaModalProps> = ({ isOpen, onClose, onSucc
 
                 <div className="col-md-8 mb-3">
                   <label className="form-label fw-bold text-secondary small">Categoria</label>
-                  <select className="form-select shadow-sm" name="id_responsavel" value={formData.id_categoria} onChange={handleChange} required>
+                  <select className="form-select shadow-sm" name="id_categoria" value={formData.id_categoria} onChange={handleChange} required>
                     <option value="" disabled>Selecione...</option>
                     {listaCategorias.map(cat => (
                       <option key={cat.id_categoria} value={cat.id_categoria}>

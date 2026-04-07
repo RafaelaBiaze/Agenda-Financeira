@@ -19,17 +19,22 @@ class ContasModel {
   // Função para listar todas as contas com os nomes das categorias
   async listarTodas(
     id_usuario: number, 
-    filtros?: { 
+    filtros: { 
       busca?: string; 
       mes?: number; 
       ano?: number;
+      data_inicio?: string;
+      data_fim?: string;
+      status?: string;
       filtroCategoria?: string;
       filtroResponsavel?: string;
       limit?: number; 
-      offset?: number
+      offset?: number;
+      orderField: string;
+      orderDirection?: string;
     }
   ): Promise<(IConta & { nome_categoria: string; nome_responsavel: string })[]> {
-    const { busca, mes, ano, filtroCategoria, filtroResponsavel, limit = 10, offset = 0 } = filtros || {};
+    const { busca, mes, ano, data_inicio, data_fim, status, filtroCategoria, filtroResponsavel, limit = 10, offset = 0, orderField, orderDirection } = filtros || {};
     const query = connection<IConta>('contas')
       .where('contas.id_usuario', id_usuario)
       .leftJoin('categorias', 'contas.id_categoria', 'categorias.id_categoria')
@@ -42,7 +47,7 @@ class ContasModel {
         'comprovantes.caminho_arquivo'
       );
 
-    // 2. Filtros Dinâmicos (para busca personalizada)
+    // 1. Filtros Dinâmicos (para busca personalizada)
     if (filtroCategoria) {
       query.where('categorias.nome_categoria', 'ilike', `%${filtroCategoria}%`);
     }
@@ -56,6 +61,10 @@ class ContasModel {
         builder.where('contas.descricao', 'ilike', `%${busca}%`)
                .orWhere('responsaveis.nome', 'ilike', `%${busca}%`);
       });
+    }
+
+    if (status) {
+      query.where('contas.status', status);
     }
 
     if (ano && Number(ano) > 0) {
@@ -72,10 +81,31 @@ class ContasModel {
       }
     }
 
+    if (data_inicio && data_fim) {
+      query.where('contas.data_vencimento', '>=', `${data_inicio} 00:00:00`)
+           .where('contas.data_vencimento', '<=', `${data_fim} 23:59:59`);
+    } else if (data_inicio) {
+      query.where('contas.data_vencimento', '>=', `${data_inicio} 00:00:00`);
+    } else if (data_fim) {
+      query.where('contas.data_vencimento', '<=', `${data_fim} 23:59:59`);
+    }
+
+    // 2. Dicionário de tradução (Frontend -> Banco de Dados)
+    let colunaBanco = 'contas.data_vencimento'; // padrão
+    
+    switch (orderField) {
+      case 'descricao': colunaBanco = 'contas.descricao'; break;
+      case 'valor': colunaBanco = 'contas.valor'; break;
+      case 'status': colunaBanco = 'contas.status'; break;
+      case 'data_vencimento': colunaBanco = 'contas.data_vencimento'; break;
+      case 'responsavel_nome': colunaBanco = 'responsaveis.nome'; break;
+      case 'categoria_nome': colunaBanco = 'categorias.nome_categoria'; break;
+    }
+
     // 3. Aplica a ordenação e o limite CHAMANDO a variável 'query'
+    query.orderBy(colunaBanco, orderDirection);
     query.limit(limit);
     query.offset(offset);
-    query.orderBy('contas.data_vencimento', 'asc');
 
     return query
   }

@@ -28,6 +28,9 @@ const Contas: React.FC = () => {
   const [mes, setMes] = useState(new Date().getMonth() + 1);
   const [ano, setAno] = useState(new Date().getFullYear());
 
+  // Estados ordernação
+  const [orderBy, setOrderBy] = useState<string>('');
+
   // Estados Modal de edição de conta
   const [isModalEditarOpen, setIsModalEditarOpen] = useState(false);
   const [contaSelecionada, setContaSelecionada] = useState<any>(null);
@@ -48,7 +51,8 @@ const Contas: React.FC = () => {
             mes: mes,
             ano: ano,
             limit: 10,
-            offset: offsetAtual
+            offset: offsetAtual,
+            orderBy: orderBy
         }
       });
       setContas(response.data.rows || []);
@@ -63,12 +67,12 @@ const Contas: React.FC = () => {
   // Recarrega tabela
   useEffect(() => {
     carregarContas();
-  }, [mes, ano, busca, offsetAtual]); 
+  }, [mes, ano, busca, offsetAtual, orderBy]); 
 
   // Volta para primeira pagina ao usar barra de busca
   useEffect(() => {
     setOffsetAtual(0);
-  }, [busca, mes, ano]);
+  }, [busca, mes, ano, orderBy]);
 
   // Função para lidar com a exclusão
   const handleExcluir = async (id: number) => {
@@ -83,6 +87,62 @@ const Contas: React.FC = () => {
         alert("Erro ao excluir a conta. Tente novamente.");
       }
     }
+  };
+
+  // Função para lidar com ordenação
+  const requestSort = (coluna: string) => {
+    const [currentColumn, currentOrder] = orderBy.split(',');
+    
+    if (currentColumn === coluna) {
+      // Inverte a ordem se clicou na mesma coluna
+      setOrderBy(`${coluna},${currentOrder === 'asc' ? 'desc' : 'asc'}`);
+    } else {
+      // Começa como 'asc' se clicou em uma nova
+      setOrderBy(`${coluna},asc`);
+    }
+  };
+
+  const renderSortIcon = (coluna: string) => {
+    const [currentColumn, currentOrder] = orderBy.split(',');
+    
+    const isActive = currentColumn === coluna;
+    const isAsc = isActive && currentOrder === 'asc';
+    const isDesc = isActive && currentOrder === 'desc';
+
+    const classeCima = isAsc ? 'text-primary' : 'text-muted';
+    const classeBaixo = isDesc ? 'text-primary' : 'text-muted';
+
+    return (
+      <span
+        key={`${coluna}-${isActive}-${currentOrder}`} 
+        style={{ position: 'relative', display: 'inline-flex', flexDirection: 'column', width: '0.6em', height: '1.2em', verticalAlign: 'middle', marginLeft: '6px' }}>
+        
+        {/* SETA PARA CIMA */}
+        <i 
+          className={`fas fa-sort-up ${classeCima}`} 
+          style={{ 
+            fontSize: '0.85rem',
+            position: 'absolute',
+            top: '-4px',
+            opacity: isAsc ? 1 : 0.4,
+            transition: 'all 0.2s ease'
+          }}
+        ></i>
+        
+        {/* SETA PARA BAIXO */}
+        <i 
+          className={`fas fa-sort-down ${classeBaixo}`} 
+          style={{ 
+            fontSize: '0.85rem',
+            position: 'absolute',
+            bottom: '-1px',
+            opacity: isDesc ? 1 : 0.4,
+            transition: 'all 0.2s ease'
+          }}
+        ></i>
+
+      </span>
+    );
   };
 
   return (
@@ -166,12 +226,24 @@ const Contas: React.FC = () => {
             <table className="table table-bordered table-hover text-nowrap mb-0">
               <thead className="table-light">
                 <tr>
-                  <th>Descrição</th>
-                  <th>Valor</th>
-                  <th>Vencimento</th>
-                  <th>Status</th>
-                  <th>Responsável</th>
-                  <th>Categoria</th>
+                  <th onClick={() => requestSort('descricao')} style={{ cursor: 'pointer' }} className="user-select-none">
+                    Descrição {renderSortIcon('descricao')}
+                  </th>
+                  <th onClick={() => requestSort('valor')} style={{ cursor: 'pointer' }} className="user-select-none">
+                    Valor {renderSortIcon('valor')}
+                  </th>
+                  <th onClick={() => requestSort('data_vencimento')} style={{ cursor: 'pointer' }} className="user-select-none">
+                    Vencimento {renderSortIcon('data_vencimento')}
+                  </th>
+                  <th onClick={() => requestSort('status')} style={{ cursor: 'pointer' }} className="user-select-none">
+                    Status {renderSortIcon('status')}
+                  </th>
+                  <th onClick={() => requestSort('responsavel_nome')} style={{ cursor: 'pointer' }} className="user-select-none">
+                    Responsável {renderSortIcon('responsavel_nome')}
+                  </th>
+                  <th onClick={() => requestSort('categoria_nome')} style={{ cursor: 'pointer' }} className="user-select-none">
+                    Categoria {renderSortIcon('categoria_nome')}
+                  </th>
                   <th className="text-center">Comprovante</th>
                   <th className="text-center">Ações</th>
                 </tr>
