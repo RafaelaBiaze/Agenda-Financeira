@@ -170,6 +170,36 @@ const Dashboard: React.FC = () => {
         </button>
       </div>
 
+      {/* 2. Cards */}
+      <div className="row">
+        <div className="col-xl-4 col-md-6 mb-4">
+          <div className="card bg-success text-white h-100 shadow-sm border-0">
+            <div className="card-body">
+              <div className="small text-white-50">Total Pago</div>
+              <div className="fs-4 fw-bold">{dados?.pago.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-xl-4 col-md-6 mb-4">
+          <div className="card bg-warning text-white h-100 shadow-sm border-0">
+            <div className="card-body">
+              <div className="small text-white-50">Pendente (A Vencer)</div>
+              <div className="fs-4 fw-bold">{dados?.pendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-xl-4 col-md-6 mb-4">
+          <div className="card bg-danger text-white h-100 shadow-sm border-0">
+            <div className="card-body">
+              <div className="small text-white-50">Em Atraso</div>
+              <div className="fs-4 fw-bold">{dados?.qtdAtrasadas || 0} contas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 3. Gráficos */}
       <div className="row">
         <div className="col-xl-6">

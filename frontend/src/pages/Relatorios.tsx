@@ -29,7 +29,7 @@ const Relatorios: React.FC = () => {
   const [dataInicio, setDataInicio] = useState<string>('');
   const [dataFim, setDataFim] = useState<string>('');
 
-  const [status, setStatus] = useState<string>('');
+  const [status, setStatus] = useState<string>(''); 
   const [filtroResponsavel, setFiltroResponsavel] = useState<string>('');
   const [filtroCategoria, setFiltroCategoria] = useState<string>('');
 
