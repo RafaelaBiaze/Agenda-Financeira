@@ -25,7 +25,7 @@ const NovaContaModal: React.FC<NovaContaModalProps> = ({ isOpen, onClose, onSucc
     descricao: '',
     valor: '',
     data_vencimento: '',
-    status: '',
+    status: 'pendente',
     id_categoria: 1,
     id_responsavel: 1 
   });
@@ -65,7 +65,7 @@ const NovaContaModal: React.FC<NovaContaModalProps> = ({ isOpen, onClose, onSucc
       descricao: '',
       valor: '',
       data_vencimento: '',
-      status: '',
+      status: 'pendente',
       id_categoria: 1,
       id_responsavel: 1
     });

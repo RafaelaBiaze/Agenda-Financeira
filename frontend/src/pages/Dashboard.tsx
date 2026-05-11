@@ -120,14 +120,43 @@ const Dashboard: React.FC = () => {
 
   const renderSortIcon = (coluna: string) => {
     const [currentColumn, currentOrder] = orderBy.split(',');
+    
     const isActive = currentColumn === coluna;
     const isAsc = isActive && currentOrder === 'asc';
     const isDesc = isActive && currentOrder === 'desc';
 
+    const classeCima = isAsc ? 'text-primary' : 'text-muted';
+    const classeBaixo = isDesc ? 'text-primary' : 'text-muted';
+
     return (
-      <span style={{ position: 'relative', display: 'inline-flex', flexDirection: 'column', width: '0.6em', verticalAlign: 'middle', marginLeft: '6px' }}>
-        <i className={`fas fa-sort-up ${isAsc ? 'text-primary' : 'text-muted'}`} style={{ fontSize: '0.85rem', opacity: isAsc ? 1 : 0.4 }}></i>
-        <i className={`fas fa-sort-down ${isDesc ? 'text-primary' : 'text-muted'}`} style={{ fontSize: '0.85rem', marginTop: '-8px', opacity: isDesc ? 1 : 0.4 }}></i>
+      <span
+        key={`${coluna}-${isActive}-${currentOrder}`} 
+        style={{ position: 'relative', display: 'inline-flex', flexDirection: 'column', width: '0.6em', height: '1.2em', verticalAlign: 'middle', marginLeft: '6px' }}>
+        
+        {/* SETA PARA CIMA */}
+        <i 
+          className={`fas fa-sort-up ${classeCima}`} 
+          style={{ 
+            fontSize: '0.85rem',
+            position: 'absolute',
+            top: '-4px',
+            opacity: isAsc ? 1 : 0.4,
+            transition: 'all 0.2s ease'
+          }}
+        ></i>
+        
+        {/* SETA PARA BAIXO */}
+        <i 
+          className={`fas fa-sort-down ${classeBaixo}`} 
+          style={{ 
+            fontSize: '0.85rem',
+            position: 'absolute',
+            bottom: '-1px',
+            opacity: isDesc ? 1 : 0.4,
+            transition: 'all 0.2s ease'
+          }}
+        ></i>
+
       </span>
     );
   };

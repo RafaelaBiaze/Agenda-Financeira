@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import api from './services/api.ts';
 import './assets/css/styles.css';
+import './assets/css/custom.css';
+import logo from './assets/logo-sistema.png';
 
 // Importe seus componentes e páginas
 import MainLayout from './layouts/MainLayout';
@@ -62,8 +64,9 @@ function App() {
       <main className="container-fluid vh-100 d-flex align-items-center justify-content-center bg-white">
         <div className="card p-4 shadow-sm border" style={{ maxWidth: '400px', width: '100%', borderRadius: '15px' }}>
           <div className="card-body text-center">
-            <h1 className="h3 mb-1 fw-bold" style={{ color: '#f39c12' }}>Sol Encantado</h1>
-            <p className="text-muted mb-4 small">Gestão Financeira Acadêmica</p>
+            <img src={logo} alt="Smart Agenda" className="img-fluid w-50 d-block mx-auto mb-4"/>
+            <h1 className="h3 mb-1 fw-bold" style={{ color: '#005088' }}>Smart Agenda</h1>
+            <p className="text-muted mb-4 small">Agenda financeira</p>
 
             <form onSubmit={handleLogin}>
               <div className="mb-3 text-start">
@@ -94,7 +97,7 @@ function App() {
                 type="submit" 
                 className="btn btn-warning w-100 fw-bold text-white shadow-sm"
                 disabled={loading}
-                style={{ backgroundColor: '#f39c12', border: 'none', padding: '12px' }}
+                style={{ backgroundColor: '#005088', border: 'none', padding: '12px' }}
               >
                 {loading ? 'Validando...' : 'Acessar Sistema'}
               </button>

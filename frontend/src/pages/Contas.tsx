@@ -189,10 +189,11 @@ const Contas: React.FC = () => {
                 <option value={5}>Maio</option>
                 <option value={6}>Junho</option>
                 <option value={7}>Julho</option>
-                <option value={8}>Setembro</option>
-                <option value={9}>Outubro</option>
-                <option value={10}>Novembro</option>
-                <option value={11}>Dezembro</option>
+                <option value={8}>Agosto</option>
+                <option value={9}>Setembro</option>
+                <option value={10}>Outubro</option>
+                <option value={11}>Novembro</option>
+                <option value={12}>Dezembro</option>
               </select>
             </div>
 

@@ -268,7 +268,8 @@ const Relatorios: React.FC = () => {
               <select className="form-select" value={status} onChange={(e) => setStatus(e.target.value)}>
                 <option value="">Todos</option>
                 <option value="pago">Pago</option>
-                <option value="pendente">Pendente / Atrasado</option>
+                <option value="pendente">Pendente</option>
+                <option value="atrasado">Atrasado</option>
               </select>
             </div>
 

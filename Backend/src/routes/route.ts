@@ -34,7 +34,6 @@ import ComprovantesControllersList from '../controllers/Comprovantes/Comprovante
 import ComprovantesControllersListID from '../controllers/Comprovantes/ComprovantesControllersListID.js';
 import ComprovantesControllersUpdate from '../controllers/Comprovantes/ComprovantesControllersUpdate.js';
 import ComprovantesControllerRemove from '../controllers/Comprovantes/ComprovantesControllersRemove.js';
-import UsuariosControllersCreate from '../controllers/Usuarios/UsuariosControllersCreate.js';
 
 const routes = Router();
 
@@ -92,7 +91,7 @@ routes.get('/dashboard/summary', authMiddleware, DashboardController.summary);
 
 // Usuários
 // Quando o navegador acessar /usuarios, ele chama a função create do controller
-routes.post('/usuarios', authMiddleware, isAdmin, UsuariosControllersCreate.create);
+routes.post('/usuarios', authMiddleware, isAdmin, UsuariosControllerCreate.create);
 // Lista todos os usuários
 routes.get('/usuarios', authMiddleware, isAdmin, UsuariosControllerList.list);
 // Lista um usuário específico

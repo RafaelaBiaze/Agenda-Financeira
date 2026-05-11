@@ -281,329 +281,212 @@ const Configuracoes: React.FC = () => {
         {abaAtiva === 'categorias' && (
           <div>
             <h5 className="fw-bold mb-3">Gerenciar Categorias</h5>
-            <form onSubmit={handleAddCategoria} className="d-flex gap-2 mb-4">
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="Nome da categoria" 
-                value={novaCategoria}
-                onChange={(e) => setNovaCategoria(e.target.value)}
-                required
-              />
-              <button type="submit" className="btn btn-dark fw-bold">+ Adicionar</button>
+            <form onSubmit={handleAddCategoria} className="row g-3 align-items-end mb-4">
+              <div className="col-md-10 col-sm-12">
+                <label className="form-label small text-muted">Nome da Categoria</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  placeholder="Ex: Suprimentos, Doações..." 
+                  value={novaCategoria}
+                  onChange={(e) => setNovaCategoria(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="col-md-2 col-sm-12">
+                <button type="submit" className="btn btn-dark fw-bold w-100">+ Adicionar</button>
+              </div>
             </form>
 
-            <table className="table table-hover">
-              <thead className="table-light">
-                <tr>
-                  <th>ID</th>
-                  <th>Nome da Categoria</th>
-                  <th className="text-end">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {categorias.map(cat => (
-                  <tr key={cat.id_categoria}>
-                    <td>{cat.id_categoria}</td>
-                    {idEditando === cat.id_categoria ? (
-                      <>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="form-control form-control-sm"
-                            value={dadosEdicaoCategoria?.nome_categoria || ''}
-                            onChange={e => setDadosEdicaoCategoria({...dadosEdicaoCategoria!, nome_categoria: e.target.value})}
-                          />
-                        </td>
-                        <td className="text-end">
-                          <button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoCategoria}>
-                            Salvar
-                          </button>
-                          <button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoCategoria}>
-                            Cancelar
-                          </button>
-                        </td>
-                      </>
-                    ) : (
-                    <>
-                      <td>{cat.nome_categoria}</td> 
-                      <td className="text-end"> 
-                        <button 
-                            className="btn btn-sm btn-outline-primary me-2" 
-                            onClick={() => iniciarEdicaoCategoria(cat)}
-                          >
-                            Editar
-                        </button>
-                        <button 
-                          className="btn btn-sm btn-outline-danger" 
-                          onClick={() => handleDeleteCategoria(cat.id_categoria!)}
-                        >
-                          Excluir
-                        </button>
-                      </td>
-                    </>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="card mb-4 shadow-sm border-0">
+              <div className="card-header bg-white py-3">
+                <i className="fas fa-tags me-1 text-secondary"></i> Lista de Categorias
+              </div>
+              <div className="card-body p-0">
+                <div className="table-responsive" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                  <table className="table table-bordered table-hover text-nowrap mb-0">
+                    <thead className="table-light">
+                      <tr>
+                        <th style={{ width: '80px' }}>ID</th>
+                        <th>Nome da Categoria</th>
+                        <th className="text-center" style={{ width: '150px' }}>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {categorias.map(cat => (
+                        <tr key={cat.id_categoria}>
+                          <td>{cat.id_categoria}</td>
+                          <td>
+                            {idEditando === cat.id_categoria ? (
+                              <input 
+                                type="text" className="form-control form-control-sm"
+                                value={dadosEdicaoCategoria?.nome_categoria || ''}
+                                onChange={e => setDadosEdicaoCategoria({...dadosEdicaoCategoria!, nome_categoria: e.target.value})}
+                              />
+                            ) : cat.nome_categoria}
+                          </td>
+                          <td className="text-center">
+                            {idEditando === cat.id_categoria ? (
+                              <>
+                                <button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoCategoria}><i className="fas fa-check"></i></button>
+                                <button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoCategoria}><i className="fas fa-times"></i></button>
+                              </>
+                            ) : (
+                              <>
+                                <button className="btn btn-sm btn-outline-primary me-2" onClick={() => iniciarEdicaoCategoria(cat)}><i className="fas fa-edit"></i></button>
+                                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteCategoria(cat.id_categoria!)}><i className="fas fa-trash"></i></button>
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
         {abaAtiva === 'responsaveis' && (
           <div>
             <h5 className="fw-bold mb-3">Gerenciar Responsáveis</h5>
-            <form onSubmit={handleAddResponsavel} className="d-flex gap-2 mb-4">
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="Nome do Responsável" 
-                value={nomeResponsavel}
-                onChange={(e) => setNomeResponsavel(e.target.value)}
-                required
-              />
-              <select 
-                className="form-select" 
-                value={tipoResponsavel}
-                onChange={(e) => setTipoResponsavel(e.target.value as 'F' | 'J')}
-                >
+            <form onSubmit={handleAddResponsavel} className="row g-3 align-items-end mb-4">
+              <div className="col-md-3 col-sm-6">
+                <label className="form-label small text-muted">Nome</label>
+                <input type="text" className="form-control" placeholder="Nome do Responsável" value={nomeResponsavel} onChange={(e) => setNomeResponsavel(e.target.value)} required />
+              </div>
+              <div className="col-md-2 col-sm-6">
+                <label className="form-label small text-muted">Tipo</label>
+                <select className="form-select" value={tipoResponsavel} onChange={(e) => setTipoResponsavel(e.target.value as 'F' | 'J')}>
                   <option value="F">Pessoa Física</option>
                   <option value="J">Pessoa Jurídica</option>
-              </select>
-              <input 
-                type="text" 
-                className="form-control"
-                placeholder="Documento (CPF/CNPJ)"
-                value={documentoResponsavel}
-                onChange={(e) => setDocumentoResponsavel(e.target.value)}
-                required
-              />
-              <input 
-                type="text" 
-                className="form-control"
-                placeholder="Observações"
-                value={observacoesResponsavel}
-                onChange={(e) => setObservacoesResponsavel(e.target.value)}
-              />
-              <button type="submit" className="btn btn-dark fw-bold">+ Adicionar</button>
+                </select>
+              </div>
+              <div className="col-md-3 col-sm-6">
+                <label className="form-label small text-muted">Documento</label>
+                <input type="text" className="form-control" placeholder="Documento (CPF/CNPJ)" value={documentoResponsavel} onChange={(e) => setDocumentoResponsavel(e.target.value)} required />
+              </div>
+              <div className="col-md-2 col-sm-6">
+                <label className="form-label small text-muted">Obs</label>
+                <input type="text" className="form-control" placeholder="Observações" value={observacoesResponsavel} onChange={(e) => setObservacoesResponsavel(e.target.value)} />
+              </div>
+              <div className="col-md-2 col-sm-12">
+                <button type="submit" className="btn btn-dark fw-bold w-100">+ Adicionar</button>
+              </div>
             </form>
 
-            <table className="table table-hover">
-              <thead className="table-light">
-                <tr>
-                  <th>ID</th>
-                  <th>Nome do Responsável</th>
-                  <th>Tipo</th>
-                  <th>Documento</th>
-                  <th>Observações</th>
-                  <th className="text-end">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {responsaveis.map(res => (
-                  <tr key={res.id_responsavel}>
-                    <td>{res.id_responsavel}</td>
-                    {idEditando === res.id_responsavel ? (
-                      <>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="form-control form-control-sm"
-                            value={dadosEdicaoResponsavel?.nome || ''}
-                            onChange={e => setDadosEdicaoResponsavel({...dadosEdicaoResponsavel!, nome: e.target.value})}
-                          />
-                        </td>
-                        <td>
-                          <select 
-                            className="form-select form-select-sm"
-                            value={dadosEdicaoResponsavel?.tipo}
-                            onChange={e => setDadosEdicaoResponsavel({...dadosEdicaoResponsavel!, tipo: e.target.value as 'F' | 'J'})}
-                          >
-                            <option value="F">F</option>
-                            <option value="J">J</option>
-                          </select>
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="form-control form-control-sm"
-                            value={dadosEdicaoResponsavel?.documento || ''}
-                            onChange={e => setDadosEdicaoResponsavel({...dadosEdicaoResponsavel!, documento: e.target.value})}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="form-control form-control-sm"
-                            value={dadosEdicaoResponsavel?.observacoes || ''}
-                            onChange={e => setDadosEdicaoResponsavel({...dadosEdicaoResponsavel!, observacoes: e.target.value})}
-                          />
-                        </td>
-                        <td className="text-end">
-                          <button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoResponsavel}>
-                            Salvar
-                          </button>
-                          <button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoResponsavel}>
-                            Cancelar
-                          </button>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td>{res.nome}</td>
-                        <td><span className={`badge ${res.tipo === 'F' ? 'bg-info' : 'bg-primary'}`}>{res.tipo}</span></td>
-                        <td>{res.documento}</td>
-                        <td>{res.observacoes}</td>
-                        <td className="text-end">
-                          <button 
-                            className="btn btn-sm btn-outline-primary me-2" 
-                            onClick={() => iniciarEdicaoResponsavel(res)}
-                          >
-                            Editar
-                          </button>
-                          <button 
-                            className="btn btn-sm btn-outline-danger" 
-                            onClick={() => handleDeleteResponsavel(res.id_responsavel!)}
-                          >
-                            Excluir
-                          </button>
-                        </td>
-                      </>
-                    )}
-                </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="card mb-4 shadow-sm border-0">
+              <div className="card-header bg-white py-3">
+                <i className="fas fa-users me-1 text-secondary"></i> Lista de Responsáveis
+              </div>
+              <div className="card-body p-0">
+                <div className="table-responsive" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                  <table className="table table-bordered table-hover text-nowrap mb-0">
+                    <thead className="table-light">
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Tipo</th>
+                        <th>Documento</th>
+                        <th>Observações</th>
+                        <th className="text-center">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {responsaveis.map(res => (
+                        <tr key={res.id_responsavel}>
+                          <td>{res.id_responsavel}</td>
+                          <td>
+                            {idEditando === res.id_responsavel ? (
+                              <input type="text" className="form-control form-control-sm" value={dadosEdicaoResponsavel?.nome || ''} onChange={e => setDadosEdicaoResponsavel({...dadosEdicaoResponsavel!, nome: e.target.value})} />
+                            ) : res.nome}
+                          </td>
+                          <td><span className={`badge ${res.tipo === 'F' ? 'bg-info text-dark' : 'bg-primary'}`}>{res.tipo}</span></td>
+                          <td>{res.documento}</td>
+                          <td>{res.observacoes}</td>
+                          <td className="text-center">
+                            {idEditando === res.id_responsavel ? (
+                              <><button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoResponsavel}><i className="fas fa-check"></i></button><button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoResponsavel}><i className="fas fa-times"></i></button></>
+                            ) : (
+                              <><button className="btn btn-sm btn-outline-primary me-2" onClick={() => iniciarEdicaoResponsavel(res)}><i className="fas fa-edit"></i></button><button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteResponsavel(res.id_responsavel!)}><i className="fas fa-trash"></i></button></>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
         {abaAtiva === 'usuarios' && (
           <div>
             <h5 className="fw-bold mb-3">Gerenciar Usuários</h5>
-            <form onSubmit={handleAddUsuario} className="d-flex gap-2 mb-4">
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="Nome do Usuário" 
-                value={nomeUsuario}
-                onChange={(e) => setNomeUsuario(e.target.value)}
-                required
-              />
-              <input 
-                type="text" 
-                className="form-control"
-                placeholder="Email"
-                value={emailUsuario}
-                onChange={(e) => setEmailUsuario(e.target.value)}
-                required
-              />
-              <input 
-                type="text" 
-                className="form-control"
-                placeholder="Senha"
-                value={senhaUsuario}
-                onChange={(e) => setSenhaUsuario(e.target.value)}
-                required
-              />
-              <select 
-                className="form-select" 
-                value={roleUsuario}
-                onChange={(e) => setRoleUsuario(e.target.value as 'admin' | 'user')}
-                >
-                  <option value="admin">Administrador</option>
-                  <option value="user">Usuário</option>
-              </select>
-              <button type="submit" className="btn btn-dark fw-bold">+ Adicionar</button>
+            <form onSubmit={handleAddUsuario} className="row g-3 align-items-end mb-4">
+              <div className="col-md-3 col-sm-6">
+                <label className="form-label small text-muted">Nome</label>
+                <input type="text" className="form-control" placeholder="Nome do Usuário" value={nomeUsuario} onChange={(e) => setNomeUsuario(e.target.value)} required />
+              </div>
+              <div className="col-md-3 col-sm-6">
+                <label className="form-label small text-muted">Email</label>
+                <input type="email" className="form-control" placeholder="Email" value={emailUsuario} onChange={(e) => setEmailUsuario(e.target.value)} required />
+              </div>
+              <div className="col-md-2 col-sm-6">
+                <label className="form-label small text-muted">Senha</label>
+                <input type="password" className="form-control" placeholder="Senha" value={senhaUsuario} onChange={(e) => setSenhaUsuario(e.target.value)} required />
+              </div>
+              <div className="col-md-2 col-sm-6">
+                <label className="form-label small text-muted">Nível</label>
+                <select className="form-select" value={roleUsuario} onChange={(e) => setRoleUsuario(e.target.value as 'admin' | 'user')}>
+                  <option value="admin">Admin</option>
+                  <option value="user">User</option>
+                </select>
+              </div>
+              <div className="col-md-2 col-sm-12">
+                <button type="submit" className="btn btn-dark fw-bold w-100">+ Adicionar</button>
+              </div>
             </form>
 
-            <table className="table table-hover">
-              <thead className="table-light">
-                <tr>
-                  <th>ID</th>
-                  <th>Nome do Usuário</th>
-                  <th>Email</th>
-                  <th>Senha</th>
-                  <th>Role</th>
-                  <th className="text-end">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {usuarios.map(res => (
-                  <tr key={res.id_usuario}>
-                    <td>{res.id_usuario}</td>
-                    
-                    {idEditando === res.id_usuario ? (
-                      <>
-                        <td>
-                          <input 
-                            type="text" 
-                            className="form-control form-control-sm"
-                            value={dadosEdicaoUsuario?.nome || ''}
-                            onChange={e => setDadosEdicaoUsuario({...dadosEdicaoUsuario!, nome: e.target.value})}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="email" 
-                            className="form-control form-control-sm"
-                            value={dadosEdicaoUsuario?.email || ''}
-                            onChange={e => setDadosEdicaoUsuario({...dadosEdicaoUsuario!, email: e.target.value})}
-                          />
-                        </td>
-                        <td>
-                          <input 
-                            type="password"
-                            className="form-control form-control-sm"
-                            placeholder="Nova senha (ou vazio)"
-                            value={dadosEdicaoUsuario?.senha || ''}
-                            onChange={e => setDadosEdicaoUsuario({...dadosEdicaoUsuario!, senha: e.target.value})}
-                          />
-                        </td>
-                        <td>
-                          <select 
-                            className="form-select form-select-sm"
-                            value={dadosEdicaoUsuario?.role || 'user'}
-                            onChange={e => setDadosEdicaoUsuario({...dadosEdicaoUsuario!, role: e.target.value as 'admin' | 'user'})}
-                          >
-                            <option value="admin">admin</option>
-                            <option value="user">user</option>
-                          </select>
-                        </td>
-                        <td className="text-end">
-                          <button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoUsuario}>
-                            Salvar
-                          </button>
-                          <button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoUsuario}>
-                            Cancelar
-                          </button>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td>{res.nome}</td>
-                        <td>{res.email}</td>
-                        <td className="text-muted" title="Senha protegida">••••••••</td> {/* Esconder a senha */}
-                        <td><span className={`badge ${res.role === 'admin' ? 'bg-info text-dark' : 'bg-secondary'}`}>{res.role}</span></td>
-                        <td className="text-end">
-                          <button 
-                            className="btn btn-sm btn-outline-primary me-2" 
-                            onClick={() => iniciarEdicaoUsuario(res)}
-                          >
-                            Editar
-                          </button>
-                          <button 
-                            className="btn btn-sm btn-outline-danger" 
-                            onClick={() => handleDeleteUsuario(res.id_usuario!)}
-                          >
-                            Excluir
-                          </button>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="card mb-4 shadow-sm border-0">
+              <div className="card-header bg-white py-3">
+                <i className="fas fa-user-shield me-1 text-secondary"></i> Lista de Usuários
+              </div>
+              <div className="card-body p-0">
+                <div className="table-responsive" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                  <table className="table table-bordered table-hover text-nowrap mb-0">
+                    <thead className="table-light">
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Nível</th>
+                        <th className="text-center">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {usuarios.map(res => (
+                        <tr key={res.id_usuario}>
+                          <td>{res.id_usuario}</td>
+                          <td>{idEditando === res.id_usuario ? <input className="form-control form-control-sm" value={dadosEdicaoUsuario?.nome || ''} onChange={e => setDadosEdicaoUsuario({...dadosEdicaoUsuario!, nome: e.target.value})} /> : res.nome}</td>
+                          <td>{res.email}</td>
+                          <td><span className={`badge ${res.role === 'admin' ? 'bg-info text-dark' : 'bg-secondary'}`}>{res.role}</span></td>
+                          <td className="text-center">
+                            {idEditando === res.id_usuario ? (
+                              <><button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoUsuario}><i className="fas fa-check"></i></button><button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoUsuario}><i className="fas fa-times"></i></button></>
+                            ) : (
+                              <><button className="btn btn-sm btn-outline-primary me-2" onClick={() => iniciarEdicaoUsuario(res)}><i className="fas fa-edit"></i></button><button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteUsuario(res.id_usuario!)}><i className="fas fa-trash"></i></button></>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

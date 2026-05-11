@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:15
-    container_name: ong_financeiro_db
+    container_name: agenda_db
     restart: always
     env_file:
       - .env
@@ -12,28 +12,10 @@ services:
       POSTGRES_PASSWORD: ${PG_PASSWORD}
       POSTGRES_DB: ${PG_DB}
       TZ: 'America/Sao_Paulo'
-    ports:
-      - "5432:5432"
     networks:
       - backend_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin_ong
-    restart: always
-    env_file:
-      - .env
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
-    ports:
-      - "8080:80"
-    networks:
-      - backend_network
-    depends_on:
-      - db
 
   backend:
     build:
@@ -42,15 +24,16 @@ services:
     env_file:
       - .env
     container_name: agenda_backend
+    restart: always
     volumes:
       - .:/app
       - /app/node_modules # Impede que o Windows sobrescreva os módulos do Docker
+      - ./uploads:/app/uploads
     environment:
-      DATABASE_URL: postgresql://${PG_USER}:${PG_PASSWORD}@db:5432/agenda_financeira
+      DATABASE_URL: postgresql://${PG_USER}:${PG_PASSWORD}@db:${PG_PORT}/${PG_DB}
       PORT: 3333
     networks:
       - backend_network
-      - frontend_network
     depends_on:
       - db
 
@@ -65,8 +48,10 @@ services:
       - ./nginx/manutencao.html:/usr/share/nginx/html/manutencao.html:ro
     networks:
       - frontend_network
+      - backend_network
     depends_on:
-      - backend 
+      - backend
+      - frontend
 
   frontend:
     build:
@@ -78,12 +63,10 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
-    ports:
-      - "5173:5173"
     networks:
       - frontend_network
     depends_on:
-      - nginx
+      - backend
         
 volumes:
   postgres_data:

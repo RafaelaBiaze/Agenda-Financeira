@@ -1,0 +1,113 @@
+/* 1. CORES DA MARCA */
+
+:root {
+--bs-primary: #004d80; /* Azul Marinho do Logo */
+  --bs-info: #35a5a3;
+}
+
+.btn-primary, .bg-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  color: white !important;
+}
+
+/* O texto apenas muda a cor da letra (Isso conserta a setinha!) */
+.text-primary {
+  color: var(--bs-primary) !important;
+  background-color: transparent !important;
+}
+
+/* O fundo do menu lateral (Sidebar) e topo (Topbar) para o tom do logo */
+/* Assumindo que o template usa a classe .bg-dark ou similar */
+.bg-dark, .sidebar {
+  background-color: #00223b !important; /* Um tom super escuro e elegante do seu azul */
+}
+
+/* 2. PROFUNDIDADE E BORDAS */
+.card {
+  border: none !important;
+  /* Sombra moderna: difusa, ampla e muito suave */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  border-radius: 12px !important; /* Bordas um pouquinho mais arredondadas */
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Arredonda sutilmente os inputs e botões */
+.form-control, .form-select, .btn {
+  border-radius: 8px !important;
+}
+
+/* 3. EFEITOS DE HOVER (Passar o mouse) */
+.btn {
+  transition: all 0.3s ease !important; 
+}
+
+.btn:hover {
+  transform: translateY(-2px); /* Levanta o botão 2 pixels */
+  box-shadow: 0 6px 12px rgba(0, 77, 128, 0.2) !important; /* Cria uma sombra da cor do logo */
+  filter: brightness(1.1); /* Deixa a cor levemente mais viva */
+}
+
+/* 4. ETIQUETAS (BADGES) MODERNAS */
+.badge {
+  padding: 0.5em 0.8em !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px;
+}
+
+/* Pago (Verde Suave) */
+.badge.bg-success {
+  background-color: #d1e7dd !important; /* Fundo verde pastel */
+  color: #0f5132 !important; /* Texto verde escuro */
+}
+
+/* Atrasado (Vermelho Suave) */
+.badge.bg-danger {
+  background-color: #f8d7da !important;
+  color: #842029 !important;
+}
+
+/* Pendente (Amarelo Suave) */
+.badge.bg-warning {
+  background-color: #fff3cd !important;
+  color: #664d03 !important;
+}
+
+/* 5. SIDEBAR ELEGANTE (Menu Lateral) */
+
+/* Cor do texto dos itens inativos (um cinza-azulado moderno) */
+.nav-link.text-secondary {
+  color: #839bb1 !important;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+/* Tamanho padrão para os ícones ficarem alinhados */
+.nav-link i {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+/* Efeito ao passar o mouse em um item inativo */
+.nav-link:hover:not(.active-pill) {
+  background-color: rgba(255, 255, 255, 0.05); /* Um brilho super suave no fundo escuro */
+  color: #ffffff !important;                   /* Texto acende para branco */
+  transform: translateX(5px);                  /* Desliza levemente para a direita */
+}
+
+/* O item da página atual (Ativo) */
+.active-pill {
+  background-color: var(--bs-primary) !important;
+  color: #ffffff !important;
+  border-radius: 8px;
+  /* Sombra elegante com a cor principal */
+  box-shadow: 0 4px 12px rgba(0, 77, 128, 0.3);
+  font-weight: 600;
+}
+
+/* Faz o ícone do item ativo dar uma leve crescida */
+.active-pill i {
+  transform: scale(1.1);
+  color: var(--bs-info) !important; /* Opcional: O ícone ativo ganha o Verde Água do logo! */
+}
