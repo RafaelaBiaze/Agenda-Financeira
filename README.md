@@ -62,12 +62,12 @@ O sistema foi criado para resolver a dificuldade de organização financeira cot
 
 ## Instalação e Execução <a name="instalacao-e-execucao"></a>
 
-Siga os passos abaixo para rodar o projeto localmente, e rode os comandos num terminal (cmd):
+Siga os passos abaixo para rodar o projeto localmente, e rode os comandos num **terminal/prompt de comando (cmd)**:
 
 ### Pré-requisitos
 * [Node.js](https://nodejs.org/) (v18 ou superior)
 * [Docker](https://www.docker.com/) e Docker Compose instalados.
-* [Visual Studio Code](https://code.visualstudio.com/) ou qualquer outra IDE.
+* [Visual Studio Code](https://code.visualstudio.com/) ou qualquer outra IDE. (opcional)
 
 ### 1. Clonar o Repositório
 ```bash
@@ -117,7 +117,7 @@ copy .env.example .env
 ```bash
 cp .env.example .env
 ```
-* **O arquivo `.env` é onde fica as senhas e dados do nosso banco, jwt e do pgAdmin, configure-o de acordo com as suas preferências num IDE (Visual Studio Code).**
+* **O arquivo `.env` é onde fica as senhas e dados do nosso banco, jwt e do pgAdmin, configure-o de acordo com as suas preferências num Bloco de Notas ou IDE (Visual Studio Code).**
 
 ### 4. Inicialização do sistema
 
@@ -132,12 +132,3 @@ docker-compose up
 
 ## Acesse 
 * **Aplicação**: http://localhost
-
-## Login de Teste
-Para facilitar a avaliação do sistema, utilize as credenciais de teste abaixo:
-
-* **Email**: admin@example.com
-
-* **Senha**: admin123
-
->Nota: O sistema atualmente utiliza um middleware que simula o usuário logado para fins de demonstração.
