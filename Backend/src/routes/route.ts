@@ -35,8 +35,10 @@ import ComprovantesControllersListID from '../controllers/Comprovantes/Comprovan
 import ComprovantesControllersUpdate from '../controllers/Comprovantes/ComprovantesControllersUpdate.js';
 import ComprovantesControllerRemove from '../controllers/Comprovantes/ComprovantesControllersRemove.js';
 
-const routes = Router();
+import ResetSenhaSolicitarControllers from '../controllers/ResetSenha/ResetSenhaSolicitarControllers.js';
+import ResetSenhaRedefinirControllers from '../controllers/ResetSenha/ResetSenhaRedefinirControllers.js';
 
+const routes = Router();
 
 // Categorias
 // Lista todas as categorias
@@ -104,5 +106,11 @@ routes.delete('/usuarios/:id', authMiddleware, isAdmin, UsuariosControllerRemove
 
 // Login
 routes.post('/login', LoginController.login);
+
+// Reset Senha
+// Quando o usuário faz uma solicitação de uma nova senha
+routes.post('/reset-senha', ResetSenhaSolicitarControllers.solicitar);
+// Atualiza/substitui a senha antiga pela nova
+routes.put('/redefinir-senha', ResetSenhaRedefinirControllers.redefinir);
 
 export default routes;
