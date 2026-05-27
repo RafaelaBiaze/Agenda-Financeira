@@ -197,7 +197,7 @@ const Relatorios: React.FC = () => {
     <div className="container-fluid px-4">
       <h1 className="mt-4 mb-2">Relatórios Financeiros</h1>
       <ol className="breadcrumb mb-4">
-        <li className="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li className="breadcrumb-item"><a href="/">Home</a></li>
         <li className="breadcrumb-item active">Exportação e Relatórios</li>
       </ol>
 

@@ -8,11 +8,13 @@ import logo from './assets/logo-sistema.png';
 // Importe seus componentes e páginas
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
+import Home from './pages/Home.tsx';
 import Relatorios from './pages/Relatorios.tsx';
 import Contas from './pages/Contas.tsx';
 import Configuracoes from './pages/Configuracoes.tsx';
 import EsqueciSenha from './pages/EsqueciSenha.tsx';
 import RedefinirSenha from './pages/RedefinirSenha.tsx';
+import Termos from './pages/Termos.tsx';
 
 function App() {
   const [email, setEmail] = useState('');
@@ -63,6 +65,7 @@ function App() {
   return (
     <Router>
       <Routes>
+          <Route path="/termos" element={<Termos />} />
         {/* 1. SE NÃO ESTIVER LOGADO: Tela de login padrão */}
           {!isAuthenticated ? (
             <>
@@ -108,6 +111,15 @@ function App() {
                           {loading ? 'Validando...' : 'Acessar Sistema'}
                         </button>
 
+                        <div className="text-center mt-4 pt-3 border-top">
+                          <p className="small text-muted mb-0">
+                            Ao acessar o sistema, você concorda com nossos
+                          </p>
+                          <Link to="/termos" className="small text-primary text-decoration-none fw-medium">
+                            Termos de Uso e Política de Privacidade
+                          </Link>
+                        </div>
+
                         <div className="mt-3">
                           <Link to="/esqueci-senha" className="text-decoration-none small text-muted">
                             Esqueceu a senha?
@@ -130,7 +142,7 @@ function App() {
             /* 2. SE ESTIVER LOGADO: Mostra o Layout com Sidebar e as Rotas */
             <Route element={<MainLayout role={userRole} userName={userName} onLogout={handleLogout} />}>
               {/* Rotas acessíveis por TODOS */}
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={userRole === 'admin' ? <Dashboard /> : <Home />} />
               <Route path="/contas" element={<Contas />} />
               <Route path="/relatorios" element={<Relatorios />} />
 

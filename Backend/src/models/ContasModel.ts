@@ -28,13 +28,14 @@ class ContasModel {
       status?: string;
       filtroCategoria?: string;
       filtroResponsavel?: string;
+      status_diferente?: string;
       limit?: number; 
       offset?: number;
       orderField: string;
       orderDirection?: string;
     }
   ): Promise<(IConta & { nome_categoria: string; nome_responsavel: string })[]> {
-    const { busca, mes, ano, data_inicio, data_fim, status, filtroCategoria, filtroResponsavel, limit = 10, offset = 0, orderField, orderDirection } = filtros || {};
+    const { busca, mes, ano, data_inicio, data_fim, status, filtroCategoria, filtroResponsavel, status_diferente, limit = 10, offset = 0, orderField, orderDirection } = filtros || {};
     const query = connection<IConta>('contas')
       .where('contas.id_usuario', id_usuario)
       .leftJoin('categorias', 'contas.id_categoria', 'categorias.id_categoria')
@@ -65,6 +66,10 @@ class ContasModel {
 
     if (status) {
       query.where('contas.status', status);
+    }
+
+    if (status_diferente) {
+      query.where('contas.status', '!=', status_diferente);
     }
 
     if (ano && Number(ano) > 0) {

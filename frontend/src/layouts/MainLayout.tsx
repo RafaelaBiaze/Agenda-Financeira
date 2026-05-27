@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -41,11 +41,35 @@ const MainLayout: React.FC<MainLayoutProps> = ({ role, userName, onLogout }) => 
         {/* Menu de Usuário com nome e botão de logout */}
         <ul className="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
           <li className="nav-item dropdown">
-            <a className="nav-link dropdown-toggle" id="navbarDropdown" href='#' role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <button 
+              className="btn btn-link nav-link dropdown-toggle" 
+              id="navbarDropdown" 
+              data-bs-toggle="dropdown" 
+              aria-expanded="false"
+              style={{ textDecoration: 'none', boxShadow: 'none' }}
+            >
               <i className="fas fa-user fa-fw"></i> {userName}
-            </a>
+            </button>
+            
             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-              <li><button className="dropdown-item" onClick={onLogout}>Logout</button></li>
+              {/* Termos de Uso */}
+              <li>
+                <Link to="/termos" className="dropdown-item py-2">
+                  <i className="fas fa-file-contract fa-sm fa-fw me-2 text-muted"></i> 
+                  Termos e LGPD
+                </Link>
+              </li>
+
+              {/* Linha divisória */}
+              <li><hr className="dropdown-divider" /></li>
+              
+              {/* Botão de Sair */}
+              <li>
+                <button className="dropdown-item py-2 text-danger" onClick={onLogout}>
+                  <i className="fas fa-sign-out-alt fa-sm fa-fw me-2"></i> 
+                  Sair do Sistema
+                </button>
+              </li>
             </ul>
           </li>
         </ul>

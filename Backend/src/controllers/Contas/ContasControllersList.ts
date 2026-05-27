@@ -39,6 +39,7 @@ class ContasControllerList {
         const status = req.query.status as string;
         const filtroResponsavel = req.query.filtroResponsavel as string;
         const filtroCategoria = req.query.filtroCategoria as string;
+        const status_diferente = req.query.status_diferente as string;
         
         if (limit > MAX_GET_LIMIT) {
         return res.status(400).json({ error: `Limit máximo: ${MAX_GET_LIMIT}.` });
@@ -52,7 +53,8 @@ class ContasControllerList {
           data_fim,
           status,
           filtroResponsavel,
-          filtroCategoria, 
+          filtroCategoria,
+          status_diferente, 
           limit: limit + 1, 
           offset,
           orderField,

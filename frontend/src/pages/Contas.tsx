@@ -149,7 +149,7 @@ const Contas: React.FC = () => {
     <div className="container-fluid px-4">
       <h1 className="mt-4 mb-2">Gestão de Contas</h1>
       <ol className="breadcrumb mb-4">
-        <li className="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li className="breadcrumb-item"><a href="/">Home</a></li>
         <li className="breadcrumb-item active">Todas as Contas</li>
       </ol>
       {/* Botão de cadastro de nova conta */}

@@ -17,7 +17,7 @@ export default function Sidebar({ role }: SidebarProps) {
         }
       >
         <i className="bi bi-grid-1x2-fill"></i>
-        <span>Dashboard</span>
+        <span>Home</span>
       </NavLink>
 
       {/* Item: Contas */}
