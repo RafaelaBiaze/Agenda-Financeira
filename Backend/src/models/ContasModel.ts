@@ -29,15 +29,15 @@ class ContasModel {
       filtroCategoria?: string;
       filtroResponsavel?: string;
       status_diferente?: string;
+      role?: string;
       limit?: number; 
       offset?: number;
       orderField: string;
       orderDirection?: string;
     }
   ): Promise<(IConta & { nome_categoria: string; nome_responsavel: string })[]> {
-    const { busca, mes, ano, data_inicio, data_fim, status, filtroCategoria, filtroResponsavel, status_diferente, limit = 10, offset = 0, orderField, orderDirection } = filtros || {};
+    const { busca, mes, ano, data_inicio, data_fim, status, filtroCategoria, filtroResponsavel, status_diferente, role, limit = 10, offset = 0, orderField, orderDirection } = filtros || {};
     const query = connection<IConta>('contas')
-      .where('contas.id_usuario', id_usuario)
       .leftJoin('categorias', 'contas.id_categoria', 'categorias.id_categoria')
       .leftJoin('responsaveis', 'contas.id_responsavel', 'responsaveis.id_responsavel')
       .leftJoin('comprovantes', 'contas.id_conta', 'comprovantes.id_conta')
@@ -47,6 +47,10 @@ class ContasModel {
         'responsaveis.nome as responsavel_nome',
         'comprovantes.caminho_arquivo'
       );
+
+    if (role !== 'admin') {
+      query.where('contas.id_usuario', id_usuario);
+    }
 
     // 1. Filtros Dinâmicos (para busca personalizada)
     if (filtroCategoria) {
@@ -147,18 +151,19 @@ class ContasModel {
   }
 
   // Função para obter o resumo do dashboard (valores e dados dos gráficos)
-  async obterResumoDashboard(id_usuario: number, mes: number, ano: number) {
+  async obterResumoDashboard(id_usuario: number, mes: number, ano: number, role?: string) {
     const dataAlvo = new Date(ano, mes - 1, 1);
     const inicioMes = format(startOfMonth(dataAlvo), 'yyyy-MM-dd 00:00:00');
     const fimMes = format(endOfMonth(dataAlvo), 'yyyy-MM-dd 23:59:59');
 
     // 1. Cards
     const resumoGeral = await connection('contas')
-      .where('id_usuario', id_usuario)
+      .modify((queryBuilder) => {
+        if (role !== 'admin') queryBuilder.where('id_usuario', id_usuario);
+      })
       .select(
         connection.raw("SUM(CASE WHEN status = 'pago' THEN valor ELSE 0 END) as total_pago"),
         connection.raw("SUM(CASE WHEN status = 'pendente' THEN valor ELSE 0 END) as total_pendente"),
-        // Contas que não estão pagas E a data já passou de hoje
         connection.raw("COUNT(CASE WHEN status = 'pendente' AND data_vencimento < CURRENT_DATE THEN 1 END) as qtd_atrasadas")
       )
       .first();
@@ -168,16 +173,20 @@ class ContasModel {
       .select('categorias.nome_categoria as label')
       .sum('contas.valor as total')
       .join('categorias', 'contas.id_categoria', 'categorias.id_categoria')
-      .where('contas.id_usuario', id_usuario)
+      .modify((queryBuilder) => {
+        if (role !== 'admin') queryBuilder.where('contas.id_usuario', id_usuario);
+      })
       .groupBy('categorias.nome_categoria');
 
     // 3. Gráfico de Evolução (Mantemos os últimos 6 meses para não poluir o visual)
     const seisMesesAtras = format(startOfMonth(subMonths(new Date(), 5)), 'yyyy-MM-dd 00:00:00');
-    
+
     const evolucao = await connection('contas')
       .select(connection.raw("TO_CHAR(data_vencimento, 'MM/YYYY') as mes_ano"))
       .sum('valor as total')
-      .where('id_usuario', id_usuario)
+      .modify((queryBuilder) => {
+        if (role !== 'admin') queryBuilder.where('id_usuario', id_usuario);
+      })
       .where('data_vencimento', '>=', seisMesesAtras)
       .groupBy('mes_ano')
       .orderByRaw("MIN(data_vencimento) ASC");
@@ -187,12 +196,12 @@ class ContasModel {
       pendente: Number(resumoGeral?.total_pendente || 0),
       qtdAtrasadas: Number(resumoGeral?.qtd_atrasadas || 0),
       graficoCategorias: {
-        labels: categorias.map(c => c.label),
-        valores: categorias.map(c => Number(c.total))
+        labels: categorias.map((c: any) => c.label),
+        valores: categorias.map((c: any) => Number(c.total))
       },
       graficoEvolucao: {
-        labels: evolucao.map(e => (e as any).mes_ano),
-        valores: evolucao.map(e => Number(e.total))
+        labels: evolucao.map((e: any) => e.mes_ano),
+        valores: evolucao.map((e: any) => Number(e.total))
       }
     };
   }

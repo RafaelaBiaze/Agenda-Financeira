@@ -55,6 +55,7 @@ class ContasControllerList {
           filtroResponsavel,
           filtroCategoria,
           status_diferente, 
+          role: req.user?.role,
           limit: limit + 1, 
           offset,
           orderField,

@@ -16,8 +16,9 @@ interface DashboardSummary {
 class DashboardController {
   async summary(request: Request, response: Response) {
     try {
-      // 1. Pega o ID do usuário logado (você deve ter um middleware de autenticação que anexa isso à requisição)
-      const id_usuario = (request as any).id_usuario || 1; 
+      // 1. Pega o ID do usuário logado (um middleware de autenticação que anexa isso à requisição)
+      const id_usuario = (request as any).user?.id || (request as any).id_usuario || 1;
+      const role_usuario = (request as any).user?.role; 
 
       // 2. Pega Mês e Ano da URL ou usa o atual como padrão
       const { mes, ano } = request.query;
@@ -26,7 +27,7 @@ class DashboardController {
       const a = ano ? Number(ano) : getYear(agora);
 
       // 3. Busca os dados de resumo (valores e dados dos gráficos)
-      const dadosResumo = await ContasModel.obterResumoDashboard(id_usuario, m, a);
+      const dadosResumo = await ContasModel.obterResumoDashboard(id_usuario, m, a, role_usuario);
 
       // 4. Busca a contagem de responsáveis
       const responsaveis = await knex('responsaveis')
@@ -39,7 +40,8 @@ class DashboardController {
         ano: a,
         limit: 10,
         orderField: 'data_vencimento',
-        orderDirection: 'asc'
+        orderDirection: 'asc',
+        role: role_usuario
       });
 
       // 6. Monta o objeto final do resumo do dashboard

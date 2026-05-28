@@ -206,7 +206,7 @@ const Dashboard: React.FC = () => {
           <div className="card bg-success text-white h-100 shadow-sm border-0">
             <div className="card-body">
               <div className="small text-white-50">Total Pago</div>
-              <div className="fs-4 fw-bold">{dados?.pago.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+              <div className="fs-4 fw-bold">{dados?.pago?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
             </div>
           </div>
         </div>
@@ -215,7 +215,7 @@ const Dashboard: React.FC = () => {
           <div className="card bg-warning text-white h-100 shadow-sm border-0">
             <div className="card-body">
               <div className="small text-white-50">Pendente (A Vencer)</div>
-              <div className="fs-4 fw-bold">{dados?.pendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+              <div className="fs-4 fw-bold">{dados?.pendente?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
             </div>
           </div>
         </div>
@@ -302,7 +302,7 @@ const Dashboard: React.FC = () => {
                     .map(v => (
                       <tr key={v.id_conta}>
                         <td className="fw-medium text-dark">{v.descricao}</td>
-                        <td>{v.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                        <td>{v.valor?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                         <td>{new Date(v.data_vencimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</td>
                         <td>
                           <span className={`badge ${v.status === 'pago' ? 'bg-success' : (new Date(v.data_vencimento) < new Date() ? 'bg-danger' : 'bg-warning text-dark')}`}>

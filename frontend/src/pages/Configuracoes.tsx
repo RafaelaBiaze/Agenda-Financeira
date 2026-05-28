@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 
+// Importe os modais que criamos
+import ModalEditarCategoria from '../components/EditarCategoria';
+import ModalEditarResponsavel from '../components/EditarResponsavel';
+import ModalEditarUsuario from '../components/EditarUsuario';
+
 interface ICategoria {
   id_categoria?: number;
   nome_categoria: string;
@@ -47,11 +52,13 @@ const Configuracoes: React.FC = () => {
   const [senhaUsuario, setSenhaUsuario] = useState('');
   const [roleUsuario, setRoleUsuario] = useState<'admin' | 'user'>('user');
   
-  // Estados para edição
-  const [idEditando, setIdEditando] = useState<number | null>(null);
-  const [dadosEdicaoResponsavel, setDadosEdicaoResponsavel] = useState<IResponsavel | null>(null);
-  const [dadosEdicaoUsuario, setDadosEdicaoUsuario] = useState<IUsuario | null>(null);
-  const [dadosEdicaoCategoria, setDadosEdicaoCategoria] = useState<ICategoria | null>(null);
+  // ==========================================
+  // ESTADOS DOS MODAIS DE EDIÇÃO
+  // ==========================================
+  const [modalCategoriaAberto, setModalCategoriaAberto] = useState(false);
+  const [modalResponsavelAberto, setModalResponsavelAberto] = useState(false);
+  const [modalUsuarioAberto, setModalUsuarioAberto] = useState(false);
+  const [itemEditando, setItemEditando] = useState<any>(null); // Guarda o item que vai para o modal
   
   useEffect(() => {
     carregarDados();
@@ -171,80 +178,8 @@ const Configuracoes: React.FC = () => {
     }
   }
 
-  // Prepara a linha para edição
-  const iniciarEdicaoResponsavel = (res: IResponsavel) => {
-    setIdEditando(res.id_responsavel!);
-    setDadosEdicaoResponsavel({ ...res }); // Clona os dados atuais para o estado temporário
-  };
-
-  const iniciarEdicaoUsuario = (res: IUsuario) => {
-    setIdEditando(res.id_usuario!);
-    setDadosEdicaoUsuario({ ...res, senha: '' }); // Clona os dados atuais para o estado temporário
-  };
-
-  const iniciarEdicaoCategoria = (res: ICategoria) => {
-    setIdEditando(res.id_categoria!);
-    setDadosEdicaoCategoria({ ...res }); // Clona os dados atuais para o estado temporário
-  };
-
-  // Cancela e limpa
-  const cancelarEdicaoResponsavel = () => {
-    setIdEditando(null);
-    setDadosEdicaoResponsavel(null);
-  };
-
-  const cancelarEdicaoUsuario = () => {
-    setIdEditando(null);
-    setDadosEdicaoUsuario(null);
-  };
-
-  const cancelarEdicaoCategoria = () => {
-    setIdEditando(null);
-    setDadosEdicaoCategoria(null);
-  };
-
-  // Salva a edição da linha
-  async function handleSalvarEdicaoResponsavel() {
-    if (!dadosEdicaoResponsavel || !dadosEdicaoResponsavel.id_responsavel) return;
-    try {
-      await api.put(`/responsaveis/${dadosEdicaoResponsavel.id_responsavel}`, dadosEdicaoResponsavel);
-      setIdEditando(null);
-      setDadosEdicaoResponsavel(null);
-      carregarDados(); // Recarrega a lista atualizada
-      alert("Responsável atualizado!");
-    } catch (err) {
-      alert("Erro ao atualizar responsável.");
-    }
-  }
-
-  async function handleSalvarEdicaoUsuario() {
-    if (!dadosEdicaoUsuario || !dadosEdicaoUsuario.id_usuario) return;
-    try {
-      await api.put(`/usuarios/${dadosEdicaoUsuario.id_usuario}`, dadosEdicaoUsuario);
-      setIdEditando(null);
-      setDadosEdicaoUsuario(null);
-      carregarDados(); // Recarrega a lista atualizada
-      alert("Usuário atualizado!");
-    } catch (err) {
-      alert("Erro ao atualizar usuário.");
-    }
-  }
-
-  async function handleSalvarEdicaoCategoria() {
-    if (!dadosEdicaoCategoria || !dadosEdicaoCategoria.id_categoria) return;
-    try {
-      await api.put(`/categorias/${dadosEdicaoCategoria.id_categoria}`, dadosEdicaoCategoria);
-      setIdEditando(null);
-      setDadosEdicaoCategoria(null);
-      carregarDados(); 
-      alert("Categoria atualizada com sucesso!");
-    } catch (err) {
-      alert("Erro ao atualizar a categoria.");
-    }
-  }
-
   return (
-    <div className="container-fluid">
+    <div className="container-fluid position-relative">
       <h3 className="fw-bold mb-4">Configurações do Sistema</h3>
 
       {/* Navegação por Abas */}
@@ -316,27 +251,17 @@ const Configuracoes: React.FC = () => {
                       {categorias.map(cat => (
                         <tr key={cat.id_categoria}>
                           <td>{cat.id_categoria}</td>
-                          <td>
-                            {idEditando === cat.id_categoria ? (
-                              <input 
-                                type="text" className="form-control form-control-sm"
-                                value={dadosEdicaoCategoria?.nome_categoria || ''}
-                                onChange={e => setDadosEdicaoCategoria({...dadosEdicaoCategoria!, nome_categoria: e.target.value})}
-                              />
-                            ) : cat.nome_categoria}
-                          </td>
+                          <td>{cat.nome_categoria}</td>
                           <td className="text-center">
-                            {idEditando === cat.id_categoria ? (
-                              <>
-                                <button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoCategoria}><i className="fas fa-check"></i></button>
-                                <button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoCategoria}><i className="fas fa-times"></i></button>
-                              </>
-                            ) : (
-                              <>
-                                <button className="btn btn-sm btn-outline-primary me-2" onClick={() => iniciarEdicaoCategoria(cat)}><i className="fas fa-edit"></i></button>
-                                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteCategoria(cat.id_categoria!)}><i className="fas fa-trash"></i></button>
-                              </>
-                            )}
+                            <button 
+                              className="btn btn-sm btn-outline-primary me-2" 
+                              onClick={() => { setItemEditando(cat); setModalCategoriaAberto(true); }}
+                            >
+                              <i className="fas fa-edit"></i>
+                            </button>
+                            <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteCategoria(cat.id_categoria!)}>
+                              <i className="fas fa-trash"></i>
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -397,20 +322,20 @@ const Configuracoes: React.FC = () => {
                       {responsaveis.map(res => (
                         <tr key={res.id_responsavel}>
                           <td>{res.id_responsavel}</td>
-                          <td>
-                            {idEditando === res.id_responsavel ? (
-                              <input type="text" className="form-control form-control-sm" value={dadosEdicaoResponsavel?.nome || ''} onChange={e => setDadosEdicaoResponsavel({...dadosEdicaoResponsavel!, nome: e.target.value})} />
-                            ) : res.nome}
-                          </td>
+                          <td>{res.nome}</td>
                           <td><span className={`badge ${res.tipo === 'F' ? 'bg-info text-dark' : 'bg-primary'}`}>{res.tipo}</span></td>
                           <td>{res.documento}</td>
                           <td>{res.observacoes}</td>
                           <td className="text-center">
-                            {idEditando === res.id_responsavel ? (
-                              <><button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoResponsavel}><i className="fas fa-check"></i></button><button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoResponsavel}><i className="fas fa-times"></i></button></>
-                            ) : (
-                              <><button className="btn btn-sm btn-outline-primary me-2" onClick={() => iniciarEdicaoResponsavel(res)}><i className="fas fa-edit"></i></button><button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteResponsavel(res.id_responsavel!)}><i className="fas fa-trash"></i></button></>
-                            )}
+                            <button 
+                              className="btn btn-sm btn-outline-primary me-2" 
+                              onClick={() => { setItemEditando(res); setModalResponsavelAberto(true); }}
+                            >
+                              <i className="fas fa-edit"></i>
+                            </button>
+                            <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteResponsavel(res.id_responsavel!)}>
+                              <i className="fas fa-trash"></i>
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -470,15 +395,19 @@ const Configuracoes: React.FC = () => {
                       {usuarios.map(res => (
                         <tr key={res.id_usuario}>
                           <td>{res.id_usuario}</td>
-                          <td>{idEditando === res.id_usuario ? <input className="form-control form-control-sm" value={dadosEdicaoUsuario?.nome || ''} onChange={e => setDadosEdicaoUsuario({...dadosEdicaoUsuario!, nome: e.target.value})} /> : res.nome}</td>
+                          <td>{res.nome}</td>
                           <td>{res.email}</td>
                           <td><span className={`badge ${res.role === 'admin' ? 'bg-info text-dark' : 'bg-secondary'}`}>{res.role}</span></td>
                           <td className="text-center">
-                            {idEditando === res.id_usuario ? (
-                              <><button className="btn btn-sm btn-success me-2" onClick={handleSalvarEdicaoUsuario}><i className="fas fa-check"></i></button><button className="btn btn-sm btn-outline-secondary" onClick={cancelarEdicaoUsuario}><i className="fas fa-times"></i></button></>
-                            ) : (
-                              <><button className="btn btn-sm btn-outline-primary me-2" onClick={() => iniciarEdicaoUsuario(res)}><i className="fas fa-edit"></i></button><button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteUsuario(res.id_usuario!)}><i className="fas fa-trash"></i></button></>
-                            )}
+                            <button 
+                              className="btn btn-sm btn-outline-primary me-2" 
+                              onClick={() => { setItemEditando(res); setModalUsuarioAberto(true); }}
+                            >
+                              <i className="fas fa-edit"></i>
+                            </button>
+                            <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteUsuario(res.id_usuario!)}>
+                              <i className="fas fa-trash"></i>
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -491,6 +420,31 @@ const Configuracoes: React.FC = () => {
         )}
 
       </div>
+
+      {/* ========================================== */}
+      {/* RENDERIZAÇÃO DOS MODAIS SEPARADOS          */}
+      {/* ========================================== */}
+      <ModalEditarCategoria 
+        isOpen={modalCategoriaAberto} 
+        onClose={() => setModalCategoriaAberto(false)} 
+        onSuccess={carregarDados} 
+        categoria={itemEditando} 
+      />
+      
+      <ModalEditarResponsavel 
+        isOpen={modalResponsavelAberto} 
+        onClose={() => setModalResponsavelAberto(false)} 
+        onSuccess={carregarDados} 
+        responsavel={itemEditando} 
+      />
+      
+      <ModalEditarUsuario 
+        isOpen={modalUsuarioAberto} 
+        onClose={() => setModalUsuarioAberto(false)} 
+        onSuccess={carregarDados} 
+        usuario={itemEditando} 
+      />
+
     </div>
   );
 };
