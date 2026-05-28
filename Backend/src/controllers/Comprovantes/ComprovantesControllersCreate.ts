@@ -28,14 +28,30 @@ class ComprovantesController {
         return res.status(403).json({ error: 'Conta não encontrada ou sem permissão' });
       }
 
-      // 3. Limpa o nome do arquivo
+      // 3. Busca se já existe qualquer comprovante atrelado a esta conta específica
+      const comprovanteExistente = await ComprovanteModel.buscarPorConta(Number(id_conta));
+
+      if (comprovanteExistente) {
+        // Remove o arquivo físico antigo da pasta uploads
+        const caminhoAntigo = path.join('uploads', comprovanteExistente.caminho_arquivo);
+        if (fs.existsSync(caminhoAntigo)) {
+          fs.unlinkSync(caminhoAntigo);
+        }
+        
+        // Deleta o registro antigo usando o método já existente do seu Model
+        if (comprovanteExistente.id_comprovante) {
+          await ComprovanteModel.excluir(comprovanteExistente.id_comprovante);
+        }
+      }
+
+      // 4. Limpa o nome do arquivo
       const nomeLimpo = arquivo.name.replace(/\s+/g, '_');
       const newName = `${Date.now()}_${nomeLimpo}`;
       
       // Caminho onde o arquivo vai salvar no servidor
       const caminho = path.join('uploads', newName);
 
-      // 4. Primeiro tentamos mover o arquivo físico
+      // 5. Primeiro tentamos mover o arquivo físico
       arquivo.mv(caminho, async (err) => {
         if (err) {
           console.error(err);
@@ -43,7 +59,7 @@ class ComprovantesController {
         }
 
         try {
-          // 5. Se o arquivo foi movido, salvamos a referência no banco
+          // 6. Se o arquivo foi movido, salvamos a referência no banco
           const novoComprovante = await ComprovanteModel.criar({
             id_conta: Number(id_conta),
             caminho_arquivo: newName,
@@ -56,7 +72,7 @@ class ComprovantesController {
           });
 
         } catch (dbError) {
-          // 6. Se erro, deleta o arquivo para não ocupar espaço desnecessário
+          // 7. Se erro, deleta o arquivo para não ocupar espaço desnecessário
           if (fs.existsSync(caminho)) fs.unlinkSync(caminho);
           return res.status(500).json({ error: 'Erro ao salvar no banco de dados' });
         }

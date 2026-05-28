@@ -42,6 +42,13 @@ class ComprovantesModel {
       .first();
   }
 
+  // Buscar um comprovante específico pelo ID da conta
+  async buscarPorConta(id_conta: number): Promise<IComprovantes | undefined> {
+    return await connection<IComprovantes>('comprovantes')
+      .where({ 'id_conta': id_conta })
+      .first();
+  }
+
   // Atualiza os dados de um comprovante existente
   async atualizar(id: number, dados: Partial<IComprovantes>): Promise<IComprovantes[]> {
     return await connection<IComprovantes>('comprovantes')
