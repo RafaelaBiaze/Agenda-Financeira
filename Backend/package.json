@@ -23,8 +23,8 @@
     "express-fileupload": "^1.5.2",
     "jsonwebtoken": "^9.0.3",
     "knex": "^3.1.0",
-    "nodemailer": "^8.0.8",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "resend": "^6.12.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

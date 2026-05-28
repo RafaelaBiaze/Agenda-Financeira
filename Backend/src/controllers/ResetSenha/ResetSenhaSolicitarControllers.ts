@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import crypto from "crypto";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import UsuariosModel from "../../models/UsuariosModel.js"; 
 import ResetSenhaModel from "../../models/ResetSenhaModel.js";
 
@@ -35,21 +35,13 @@ class ResetSenhaSolicitarController {
         expiracao: expiracao
       });
 
-      // 5. Prepara o envio do e-mail com as variáveis do .env
-      const transporter = nodemailer.createTransport({
-        host: process.env.MAIL_HOST,
-        port: Number(process.env.MAIL_PORT),
-        auth: {
-          user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASS,
-        },
-      });
-
-      // 6. Monta o link dinâmico e dispara a mensagem
+      // 5. Inicializa a API do Resend e monta o link
+      const resend = new Resend(process.env.RESEND_API_KEY);
       const linkReset = `${process.env.FRONTEND_URL}/redefinir-senha?token=${token}`;
       
-      await transporter.sendMail({
-        from: '"Suporte Sol Encantado" <nao-responder@solencantado.org.br>',
+      // 6. Dispara a mensagem via HTTPS
+      await resend.emails.send({
+        from: 'Suporte SmartAgenda <onboarding@resend.dev>',
         to: email,
         subject: "Recuperação de Senha - SmartAgenda",
         html: `
