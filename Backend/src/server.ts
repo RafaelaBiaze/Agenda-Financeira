@@ -12,6 +12,10 @@ app.use(fileUpload()); // Permite upload de arquivos
 app.use(routes);
 app.use('/arquivos', express.static(path.join(process.cwd(), 'uploads')))
 
+// ---- ROTA DE HEALTHCHECK PARA O DOCKER ----
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'API Online e Saudável!' });
+});
 
 const PORT = 3333;
 app.listen(PORT, () => {
